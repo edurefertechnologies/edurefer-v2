@@ -1,0 +1,661 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+enum AuthProvider {
+  CREDENTIALS
+  GOOGLE
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+model User {
+  id           String  @id @default(cuid())
+  firstName    String
+  lastName     String?
+  username     String? @unique
+  email        String  @unique
+  phone        String? @unique
+  passwordHash String?
+  avatarUrl    String?
+
+  role     UserRole     @default(STUDENT)
+  provider AuthProvider @default(CREDENTIALS)
+  status   UserStatus   @default(ACTIVE)
+
+  emailVerifiedAt DateTime?
+
+  referralCode String  @unique
+  referredById String?
+  referredBy   User?   @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals    User[]  @relation("UserReferrals")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  isDeleted Boolean   @default(false)
+  lastLogin DateTime?
+
+  orders Order[]
+
+  wallet Wallet?
+
+  referralsMade Referral[] @relation("ReferralOwner")
+  referredUsers Referral[] @relation("ReferralUser")
+
+  enrollments Enrollment[]
+
+  createdProducts Product[] @relation("ProductsCreated")
+  updatedProducts Product[] @relation("ProductsUpdated")
+
+  aiWallet AIWallet?
+
+  aiConversations AIConversation[]
+
+  notifications Notification[]
+
+  auditLogs AuditLog[]
+
+  @@index([email])
+  @@index([referralCode])
+}
+
+enum ProductType {
+  PDF
+  COURSE
+  AI_CREDITS
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Product {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  description      String?
+  shortDescription String?
+
+  sku   String? @unique
+  stock Int?
+
+  type   ProductType
+  status ProductStatus @default(DRAFT)
+
+  price         Decimal  @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
+
+  thumbnail String?
+
+  isDeleted Boolean @default(false)
+
+  isFeatured  Boolean   @default(false)
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  currency Currency @default(INR)
+
+  createdById String?
+  updatedById String?
+
+  createdBy User? @relation("ProductsCreated", fields: [createdById], references: [id])
+  updatedBy User? @relation("ProductsUpdated", fields: [updatedById], references: [id])
+
+  bundleItems BundleItem[]
+
+  orderItems OrderItem[]
+
+  course Course?
+
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+}
+
+enum Currency {
+  INR
+}
+
+enum BundleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Bundle {
+  id String @id @default(cuid())
+
+  name String
+  slug String @unique
+
+  description      String?
+  shortDescription String?
+
+  price         Decimal  @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
+
+  thumbnail String?
+
+  status BundleStatus @default(DRAFT)
+
+  isFeatured Boolean @default(false)
+
+  publishedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items BundleItem[]
+
+  orderItems OrderItem[]
+
+  @@index([slug])
+  @@index([status])
+}
+
+model BundleItem {
+  id String @id @default(cuid())
+
+  bundleId  String
+  productId String
+
+  quantity Int @default(1)
+
+  bundle  Bundle  @relation(fields: [bundleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([bundleId, productId])
+  @@index([bundleId])
+  @@index([productId])
+}
+
+model Order {
+  id String @id @default(cuid())
+
+  orderNumber String @unique
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status OrderStatus @default(PENDING)
+
+  subtotal Decimal @db.Decimal(10, 2)
+  discount Decimal @default(0) @db.Decimal(10, 2)
+  tax      Decimal @default(0) @db.Decimal(10, 2)
+
+  total Decimal @db.Decimal(10, 2)
+
+  currency String @default("INR")
+
+  notes String?
+
+  items OrderItem[]
+
+  payment Payment?
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Enrollment Enrollment[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model OrderItem {
+  id String @id @default(cuid())
+
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id])
+
+  bundleId String?
+  bundle   Bundle? @relation(fields: [bundleId], references: [id])
+
+  quantity Int @default(1)
+
+  unitPrice Decimal @db.Decimal(10, 2)
+
+  totalPrice Decimal @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([bundleId])
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELLED
+  REFUNDED
+}
+
+model Payment {
+  id String @id @default(cuid())
+
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  razorpayOrderId   String? @unique
+  razorpayPaymentId String? @unique
+  razorpaySignature String?
+
+  amount Decimal @db.Decimal(10, 2)
+
+  currency String @default("INR")
+
+  method PaymentMethod?
+
+  status PaymentStatus @default(PENDING)
+
+  paidAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  RAZORPAY
+  UPI
+  CARD
+  NET_BANKING
+  WALLET
+}
+
+enum WalletTransactionType {
+  CREDIT
+  DEBIT
+}
+
+enum WalletTransactionSource {
+  REFERRAL
+  WITHDRAWAL
+  ADMIN
+  REFUND
+}
+
+enum WithdrawalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Wallet {
+  id String @id @default(cuid())
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  balance Decimal @default(0) @db.Decimal(10, 2)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions WalletTransaction[]
+  withdrawals  Withdrawal[]
+}
+
+model WalletTransaction {
+  id String @id @default(cuid())
+
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  type   WalletTransactionType
+  source WalletTransactionSource
+
+  amount Decimal @db.Decimal(10, 2)
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  @@index([walletId])
+}
+
+model Referral {
+  id String @id @default(cuid())
+
+  referrerId String
+  refereeId  String @unique
+
+  referrer User @relation("ReferralOwner", fields: [referrerId], references: [id])
+  referee  User @relation("ReferralUser", fields: [refereeId], references: [id])
+
+  rewardedOrderId String?
+
+  isRewarded Boolean @default(false)
+
+  rewardedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([referrerId])
+}
+
+model Withdrawal {
+  id String @id @default(cuid())
+
+  walletId String
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  amount Decimal @db.Decimal(10, 2)
+
+  status WithdrawalStatus @default(PENDING)
+
+  remarks String?
+
+  processedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([walletId])
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+model Course {
+  id String @id @default(cuid())
+
+  productId String  @unique
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  title String
+  slug  String @unique
+
+  description String?
+
+  level    CourseLevel?
+  duration String?
+
+  thumbnail String?
+
+  status CourseStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enrollments Enrollment[]
+  modules     CourseModule[]
+
+  @@index([slug])
+}
+
+model CourseModule {
+  id String @id @default(cuid())
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  title String
+
+  sortOrder Int
+
+  lessons Lesson[]
+
+  createdAt DateTime @default(now())
+
+  @@index([courseId])
+}
+
+model Lesson {
+  id String @id @default(cuid())
+
+  moduleId String
+  module   CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  title String
+
+  description String?
+
+  videoUrl      String?
+  videoDuration Int?
+  attachmentUrl String?
+
+  duration Int?
+
+  isPreview Boolean @default(false)
+
+  sortOrder Int
+
+  createdAt DateTime @default(now())
+
+  @@index([moduleId])
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+}
+
+model Enrollment {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id])
+
+  progress Float @default(0)
+
+  status EnrollmentStatus @default(ACTIVE)
+
+  enrolledAt DateTime @default(now())
+
+  completedAt DateTime?
+
+  certificate Certificate?
+
+  @@unique([userId, courseId])
+}
+
+model Certificate {
+  id String @id @default(cuid())
+
+  enrollmentId String     @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  certificateNo String @unique
+
+  issuedAt DateTime @default(now())
+
+  pdfUrl String?
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum AIService {
+  RESUME_BUILDER
+  INTERVIEW_ASSISTANT
+  CAREER_MENTOR
+  QUIZ_GENERATOR
+  NOTES_GENERATOR
+  CODE_ASSISTANT
+}
+
+model AIWallet {
+  id        String   @id @default(cuid())
+
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  balance   Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions AITransaction[]
+  usages       AIUsage[]
+}
+
+enum AITransactionType {
+  CREDIT
+  DEBIT
+}
+
+model AITransaction {
+  id          String            @id @default(cuid())
+
+  walletId    String
+  wallet      AIWallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  type        AITransactionType
+
+  credits     Int
+
+  description String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([walletId])
+}
+
+model AIConversation {
+  id         String    @id @default(cuid())
+
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  service    AIService
+
+  title      String?
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  usages      AIUsage[]
+}
+
+model AIUsage {
+  id               String   @id @default(cuid())
+
+  walletId         String
+  wallet           AIWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  conversationId   String?
+  conversation     AIConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  creditsUsed      Int
+
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+
+  createdAt        DateTime @default(now())
+
+  @@index([walletId])
+  @@index([conversationId])
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  message     String
+
+  type        NotificationType @default(INFO)
+
+  isRead      Boolean @default(false)
+
+  actionUrl   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Setting {
+  id          String   @id @default(cuid())
+
+  key         String   @unique
+
+  value       Json
+
+  description String?
+
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  action      String
+
+  entity      String
+
+  entityId    String?
+
+  oldData     Json?
+
+  newData     Json?
+
+  ipAddress   String?
+
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([entity])
+}
