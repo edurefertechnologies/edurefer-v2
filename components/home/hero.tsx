@@ -1,0 +1,217 @@
+"use client";
+
+import Link from "next/link";
+import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, Briefcase, Award } from "lucide-react";
+
+import Container from "@/components/layout/container";
+import { Button } from "@/components/ui/button";
+
+const stats = [
+  {
+    icon: BookOpen,
+    value: "20+",
+    label: "AI Courses",
+  },
+  {
+    icon: Award,
+    value: "50+",
+    label: "Premium PDF Kits",
+  },
+  {
+    icon: Briefcase,
+    value: "100%",
+    label: "Placement Assistance",
+  },
+];
+
+export default function Hero() {
+  return (
+    <section className="relative overflow-hidden py-24 lg:py-32">
+      {/* Background Effects */}
+      <div className="absolute inset-0 hero-gradient" />
+      <div className="absolute inset-0 grid-bg opacity-30" />
+
+      <Container>
+        <div className="grid items-center gap-16 lg:grid-cols-2">
+          {/* Left */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+          >
+            <span className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              🤖 AI-Powered Career Growth Platform
+            </span>
+
+            <h1 className="mt-6 text-5xl font-bold leading-tight lg:text-7xl">
+              Learn.
+              <br />
+              <span className="text-gradient">
+                Build.
+              </span>
+              <br />
+              Get Certified.
+              <br />
+              Get Hired.
+            </h1>
+
+            <p className="mt-6 max-w-xl text-lg text-muted-foreground">
+              Master in-demand skills through AI-powered video courses,
+              premium PDF kits, smart AI tools, industry-recognized
+              certifications, and career-focused learning—all in one platform.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Link href="/courses">
+                <Button size="lg">
+                  Explore Learning Paths
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+
+              <Link href="/about">
+                <Button variant="outline" size="lg">
+                  View Bundles
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Right */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            <div className="glass-card p-6 space-y-6">
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Welcome Back
+                  </p>
+
+                  <h3 className="text-xl font-bold">
+                    Welcome, {user?.firstName ?? "Learner"} 👋
+                  </h3>
+
+                  <p className="text-sm text-muted-foreground">
+                    Continue your learning journey
+                  </p>
+                </div>
+
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {subscription?.planName ?? "Free"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+
+                <div className="rounded-xl border p-4">
+                  <p className="text-sm text-muted-foreground">
+                    AI Courses
+                  </p>
+
+                  value={dashboard?.totalCourses?.toString() ?? "0"}
+                </div>
+
+                <div className="rounded-xl border p-4">
+                  <p className="text-sm text-muted-foreground">
+                    PDF Kits
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-bold">
+                    value={dashboard?.totalPdfKits?.toString() ?? "0"}
+                  </h4>
+                </div>
+
+                <div className="rounded-xl border p-4">
+                  <p className="text-sm text-muted-foreground">
+                    AI Credits
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-bold">
+                    value={dashboard?.aiCredits?.toString() ?? "0"}
+                  </h4>
+                </div>
+
+                <div className="rounded-xl border p-4">
+                  <p className="text-sm text-muted-foreground">
+                    Wallet
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-bold">
+                    ₹500
+                  </h4>
+                </div>
+
+              </div>
+
+              <div>
+                <div className="mb-2 flex justify-between text-sm">
+                  <span>Learning Progress</span>
+                  <span>{dashboard?.progress ?? 0}%</span>
+                </div>
+
+                <div className="h-3 overflow-hidden rounded-full bg-muted">
+                  <div className="h-full w-[78%] rounded-full bg-primary" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="font-semibold">
+                  Career Bundle
+                </p>
+
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Includes AI Course, PDF Kit,
+                  AI Credits & Certificate.
+                </p>
+
+                <div className="mt-3 flex items-center gap-3">
+                  <span className="text-2xl font-bold">
+                    ₹{bundle?.discountPrice}
+                  </span>
+
+                  <span className="text-sm line-through text-muted-foreground">
+                    ₹{bundle?.discountPrice}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Stats */}
+        <div className="mt-20 grid gap-6 md:grid-cols-3">
+          {stats.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <div
+                key={item.label}
+                className="glass-card hover-lift flex items-center gap-4"
+              >
+                <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                  <Icon className="h-6 w-6" />
+                </div>
+
+                <div>
+                  <h3 className="text-2xl font-bold">
+                    {item.value}
+                  </h3>
+
+                  <p className="text-sm text-muted-foreground">
+                    {item.label}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Container>
+    </section>
+  );
+}

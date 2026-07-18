@@ -1,26 +1,468 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: var(--font-inter);
+
+  /* Background */
+  --color-background: #050816;
+  --color-foreground: #f8fafc;
+
+  /* Cards */
+  --color-card: #0f172a;
+  --color-card-foreground: #f8fafc;
+
+  /* Popover */
+  --color-popover: #0f172a;
+  --color-popover-foreground: #f8fafc;
+
+  /* Primary */
+  --color-primary: #10b981;
+  --color-primary-foreground: #ffffff;
+
+  /* Secondary */
+  --color-secondary: #172554;
+  --color-secondary-foreground: #ffffff;
+
+  /* Accent */
+  --color-accent: #f59e0b;
+  --color-accent-foreground: #000000;
+
+  /* Border */
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  /* Input */
+  --color-input: rgba(255, 255, 255, 0.08);
+
+  /* Ring */
+  --color-ring: #10b981;
+
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+
+  background:
+    radial-gradient(circle at top left, #12355b 0%, transparent 35%),
+    radial-gradient(circle at bottom right, #064e3b 0%, transparent 40%),
+    #050816;
+
+  color: var(--color-foreground);
+
+  font-family: var(--font-sans);
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
+
+/* -------------------------------- */
+/* Scrollbar */
+/* -------------------------------- */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050816;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      #10b981,
+      #0f766e);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* -------------------------------- */
+/* Text Selection */
+/* -------------------------------- */
+
+::selection {
+  background: #10b981;
+  color: white;
+}
+
+/* -------------------------------- */
+/* Links */
+/* -------------------------------- */
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* -------------------------------- */
+/* Images */
+/* -------------------------------- */
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* -------------------------------- */
+/* Glassmorphism */
+/* -------------------------------- */
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+
+  backdrop-filter: blur(18px);
+
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, .08);
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, .30);
+}
+
+.glass-card {
+  /* Expanded from Tailwind @apply to plain CSS for compatibility */
+  background: rgba(255, 255, 255, 0.05);
+
+  backdrop-filter: blur(18px);
+
+  -webkit-backdrop-filter: blur(18px);
+
+  border: 1px solid rgba(255, 255, 255, .08);
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .30);
+
+  border-radius: 1.5rem; /* equivalent to rounded-3xl */
+
+  padding: 2rem; /* equivalent to p-8 */
+}
+
+/* -------------------------------- */
+/* Containers */
+/* -------------------------------- */
+
+.container-custom {
+  width: 100%;
+  max-width: 1320px;
+
+  margin-inline: auto;
+
+  padding-inline: 1.25rem;
+}
+
+/* -------------------------------- */
+/* Buttons */
+/* -------------------------------- */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem; /* rounded-xl */
+  padding: 0.75rem 1.5rem; /* py-3 px-6 */
+  font-weight: 600; /* font-semibold */
+  transition: all 300ms;
+  background: linear-gradient(135deg,
+      #10b981,
+      #059669);
+
+  color: white;
+}
+
+.btn-primary:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 15px 40px rgba(16, 185, 129, .35);
+}
+
+.btn-secondary {
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem; /* rounded-xl */
+  border-width: 1px;
+  border-style: solid;
+  padding: 0.75rem 1.5rem; /* py-3 px-6 */
+  font-weight: 600; /* font-semibold */
+  transition: all 300ms;
+  border-color: rgba(255, 255, 255, .08);
+
+  background: rgba(255, 255, 255, .03);
+}
+
+.btn-secondary:hover {
+
+  background: rgba(255, 255, 255, .08);
+
+  border-color: #10b981;
+}
+
+/* -------------------------------- */
+/* Gradient Text */
+/* -------------------------------- */
+
+.text-gradient {
+
+  background: linear-gradient(90deg,
+      #10b981,
+      #22c55e,
+      #f59e0b);
+
+  background-clip: text;
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+}
+
+/* ==========================================================
+   Animations
+========================================================== */
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* ==========================================================
+   Fade Up
+========================================================== */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up .8s ease forwards;
+}
+
+/* ==========================================================
+   Aurora Background
+========================================================== */
+
+@keyframes aurora {
+
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+
+}
+
+.aurora {
+
+  background:
+    linear-gradient(-45deg,
+      rgba(16, 185, 129, .18),
+      rgba(37, 99, 235, .16),
+      rgba(245, 158, 11, .14),
+      rgba(16, 185, 129, .18));
+
+  background-size: 400% 400%;
+
+  animation: aurora 18s ease infinite;
+}
+
+/* ==========================================================
+   Grid Background
+========================================================== */
+
+.grid-bg {
+
+  background-image:
+
+    linear-gradient(rgba(255, 255, 255, .05) 1px,
+      transparent 1px),
+
+    linear-gradient(90deg,
+      rgba(255, 255, 255, .05) 1px,
+      transparent 1px);
+
+  background-size: 45px 45px;
+}
+
+/* ==========================================================
+   Hero Gradient
+========================================================== */
+
+.hero-gradient {
+
+  background:
+    radial-gradient(circle at top,
+      rgba(16, 185, 129, .18),
+      transparent 40%),
+
+    radial-gradient(circle at bottom,
+      rgba(245, 158, 11, .12),
+      transparent 40%);
+}
+
+/* ==========================================================
+   Glow Utilities
+========================================================== */
+
+.glow-green {
+  box-shadow:
+    0 0 40px rgba(16, 185, 129, .30);
+}
+
+.glow-gold {
+  box-shadow:
+    0 0 40px rgba(245, 158, 11, .28);
+}
+
+.glow-blue {
+  box-shadow:
+    0 0 40px rgba(59, 130, 246, .30);
+}
+
+/* ==========================================================
+   Hover Lift
+========================================================== */
+
+.hover-lift {
+
+  transition:
+    transform .35s ease,
+    box-shadow .35s ease;
+}
+
+.hover-lift:hover {
+
+  transform: translateY(-8px);
+
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, .35);
+}
+
+/* ==========================================================
+   Section Spacing
+========================================================== */
+
+.section {
+
+  padding-block: 6rem;
+}
+
+/* ==========================================================
+   Headings
+========================================================== */
+
+.heading-xl {
+
+  font-size: 3rem;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .heading-xl {
+    font-size: 3.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .heading-xl {
+    font-size: 4.5rem;
+  }
+}
+
+.heading-lg {
+
+  font-size: 2.25rem;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .heading-lg {
+    font-size: 3rem;
+  }
+}
+
+.heading-md {
+
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.text-muted {
+
+  color:
+    rgba(255, 255, 255, .72);
+}
+
+/* ==========================================================
+   Premium Card
+========================================================== */
+
+.card-premium {
+
+  border-radius: 1.5rem;
+  /* rounded-3xl */
+  border-width: 1px;
+  border-style: solid;
+  padding: 2rem;
+  /* p-8 */
+
+  border-color:
+    rgba(255, 255, 255, .08);
+
+  background:
+    rgba(255, 255, 255, .04);
+
+  backdrop-filter:
+    blur(18px);
+}
+
+/* ==========================================================
+   End
+========================================================== */
