@@ -260,6 +260,11 @@ enum OrderStatus {
   REFUNDED
 }
 
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
 model Payment {
   id String @id @default(cuid())
 
@@ -319,36 +324,32 @@ enum WithdrawalStatus {
 }
 
 model Wallet {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
+  balance   Decimal  @default(0.00) @db.Decimal(10,2)
 
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  balance Decimal @default(0) @db.Decimal(10, 2)
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  transactions WalletTransaction[]
-  withdrawals  Withdrawal[]
+  transactions WalletTransaction[] // <-- keep as you already have if named WalletTransaction
+  withdrawals Withdrawal[]
 }
 
 model WalletTransaction {
-  id String @id @default(cuid())
+  id          String   @id @default(cuid())
 
-  walletId String
-  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId    String
+  wallet      Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
-  type   WalletTransactionType
-  source WalletTransactionSource
+  type        TransactionType
 
-  amount Decimal @db.Decimal(10, 2)
+  amount      Decimal  @db.Decimal(10,2)
 
   description String?
 
-  createdAt DateTime @default(now())
-
-  @@index([walletId])
+  createdAt   DateTime @default(now())
 }
 
 model Referral {

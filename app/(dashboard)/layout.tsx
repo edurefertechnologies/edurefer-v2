@@ -6,8 +6,9 @@ import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
+
+import { AppHeader } from "@/components/dashboard/app-header";
 
 export default async function DashboardLayout({
   children,
@@ -25,9 +26,9 @@ export default async function DashboardLayout({
       <AppSidebar user={session.user} />
 
       <SidebarInset>
-        <header className="flex h-16 items-center border-b bg-background px-6">
-          <SidebarTrigger />
-        </header>
+        <AppHeader
+          name={session.user.firstName ?? "Student"}
+        />
 
         <main className="flex-1 p-6">
           {children}
