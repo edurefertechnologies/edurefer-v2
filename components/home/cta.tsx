@@ -15,7 +15,10 @@ export default function CTA() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{
+            duration: 0.8,
+            ease: "easeOut",
+          }}
           className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-background to-primary/5 p-8 md:p-12 lg:p-16"
         >
           {/* Background Glow */}
@@ -28,22 +31,21 @@ export default function CTA() {
             </span>
 
             <h2 className="mt-6 text-4xl font-bold lg:text-6xl">
-              Start Your
-              <span className="text-gradient"> Learning Journey</span>
+              Start Building Your
+              <span className="text-gradient"> Dream Career</span>
               <br />
               Today.
             </h2>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-              Learn in-demand skills, work on real-world projects, earn
-              certifications, and receive dedicated placement assistance to
-              accelerate your career.
+              Join thousands of learners mastering industry-ready skills with AI-powered courses,
+              hands-on projects, verified certificates, and dedicated placement assistance.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link href="/courses">
                 <Button size="lg" className="min-w-[220px]">
-                  Explore Courses
+                  Start Learning Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -61,10 +63,10 @@ export default function CTA() {
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
-              <span>✓ Industry-Focused Courses</span>
-              <span>✓ Hands-on Projects</span>
-              <span>✓ Expert Mentorship</span>
-              <span>✓ 100% Placement Assistance</span>
+              <span>✓ AI Powered Learning </span>
+              <span>✓ Industry Projects </span>
+              <span>✓ Verified Certificates </span>
+              <span>✓ Placement Assistance</span>
             </div>
           </div>
         </motion.div>

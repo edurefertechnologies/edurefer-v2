@@ -7,25 +7,25 @@ import Container from "@/components/layout/container";
 
 const testimonials = [
   {
-    name: "Student Name",
+    name: "Anonymous Learner",
     role: "Full Stack Development",
-    company: "Placed at Company",
+    status: "Verified Learner",
     rating: 5,
     review:
       "Edurefer helped me build practical skills through projects and mentorship. The learning experience was excellent.",
   },
   {
-    name: "Student Name",
+    name: "Anonymous Learner",
     role: "Python & AI",
-    company: "Software Engineer",
+    status: "Verified Learner",
     rating: 5,
     review:
       "The course structure was easy to follow and the projects gave me confidence for interviews.",
   },
   {
-    name: "Student Name",
+    name: "Anonymous Learner",
     role: "Java Backend",
-    company: "Backend Developer",
+    status: "Verified Learner",
     rating: 5,
     review:
       "From resume preparation to interview guidance, the overall learning journey was very valuable.",
@@ -78,6 +78,14 @@ export default function Testimonials() {
               }}
               className="glass-card hover-lift h-full"
             >
+              <div className="flex items-center justify-between">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
+                  {item.name.charAt(0)}
+                </div>
+
+                <Quote className="h-8 w-8 text-primary/40" />
+              </div>
+
               <Quote className="h-10 w-10 text-primary" />
 
               <div className="mt-5 flex">
@@ -103,7 +111,7 @@ export default function Testimonials() {
                 </p>
 
                 <p className="mt-1 text-sm font-medium text-primary">
-                  {item.company}
+                  {item.status}
                 </p>
               </div>
             </motion.div>

@@ -5,105 +5,57 @@ import {
   Phone,
 } from "lucide-react";
 
-import {
-  FaInstagram as Instagram,
-  FaLinkedin as Linkedin,
-} from "react-icons/fa6";
+import { FaInstagram, FaFacebook, FaLinkedinIn }  from "react-icons/fa";
 
 import Logo from "@/components/common/logo";
-import Container from "./container";
-
-const quickLinks = [
-  {
-    title: "Home",
-    href: "/",
-  },
-  {
-    title: "Courses",
-    href: "/courses",
-  },
-  {
-    title: "About",
-    href: "/about",
-  },
-  {
-    title: "Placements",
-    href: "/placements",
-  },
-  {
-    title: "Contact",
-    href: "/contact",
-  },
-];
-
-const courseLinks = [
-  {
-    title: "Full Stack Development",
-    href: "/courses/full-stack",
-  },
-  {
-    title: "Python Development",
-    href: "/courses/python",
-  },
-  {
-    title: "Java Development",
-    href: "/courses/java",
-  },
-  {
-    title: "Artificial Intelligence",
-    href: "/courses/ai",
-  },
-];
-
-const socialLinks = [
-  {
-    icon: Instagram,
-    href: "https://www.instagram.com/edurefer_official",
-  },
-  {
-    icon: Linkedin,
-    href: "https://www.linkedin.com/company/edurefertechnologies",
-  },
-];
+import { navigation } from "@/lib/navigation";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-card/40 backdrop-blur-xl">
-      <Container>
-        <div className="grid gap-12 py-16 lg:grid-cols-4">
+    <footer className="border-t border-border bg-background">
+      <div className="container-custom py-16">
+        <div className="grid gap-10 lg:grid-cols-4">
           {/* Company */}
-          <div>
+          <div className="space-y-5">
             <Logo />
 
-            <p className="mt-5 text-sm text-muted-foreground leading-7">
+            <p className="max-w-sm text-sm leading-6 text-muted-foreground">
               Learn. Build. Get Certified. Get Hired.
+              <br />
+              AI-powered learning platform designed to help students build
+              industry-ready skills.
             </p>
 
-            <div className="mt-6 flex gap-3">
-              {socialLinks.map(({ icon: Icon, href }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="rounded-xl border border-border p-2 transition hover:bg-primary hover:text-primary-foreground"
-                >
-                  <Icon className="h-5 w-5" />
-                </Link>
-              ))}
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                Pune, Maharashtra
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                +91 XXXXX XXXXX
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                support@edurefer.com
+              </div>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Navigation */}
           <div>
             <h3 className="mb-5 font-semibold">
-              Quick Links
+              Navigation
             </h3>
 
             <ul className="space-y-3">
-              {quickLinks.map((item) => (
+              {navigation.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-muted-foreground transition hover:text-primary"
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
                     {item.title}
                   </Link>
@@ -112,69 +64,111 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Courses */}
+          {/* Resources */}
           <div>
             <h3 className="mb-5 font-semibold">
-              Popular Courses
+              Resources
             </h3>
 
-            <ul className="space-y-3">
-              {courseLinks.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className="text-muted-foreground transition hover:text-primary"
-                  >
-                    {item.title}
-                  </Link>
-                </li>
-              ))}
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Blog
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/faq"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  FAQ
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/privacy-policy"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-muted-foreground hover:text-primary"
+                >
+                  Terms & Conditions
+                </Link>
+              </li>
             </ul>
           </div>
 
-          {/* Contact */}
+          {/* Social */}
           <div>
             <h3 className="mb-5 font-semibold">
-              Contact
+              Connect
             </h3>
 
-            <div className="space-y-4 text-sm text-muted-foreground">
-              <div className="flex gap-3">
-                <MapPin className="mt-1 h-5 w-5 text-primary" />
+            <div className="flex gap-3">
+              <Link
+                href="#"
+                className="rounded-xl border border-border p-3 transition hover:bg-muted"
+              >
+                <FaFacebook className="h-5 w-5" />
+              </Link>
 
-                <p>
-                  Pune, Maharashtra
-                </p>
-              </div>
+              <Link
+                href="#"
+                className="rounded-xl border border-border p-3 transition hover:bg-muted"
+              >
+                <FaInstagram className="h-5 w-5" />
+              </Link>
 
-              <div className="flex gap-3">
-                <Phone className="h-5 w-5 text-primary" />
-
-                <p>+91 9607522003</p>
-              </div>
-
-              <div className="flex gap-3">
-                <Mail className="h-5 w-5 text-primary" />
-
-                <p>solutions@edurefertech.com</p>
-              </div>
+              <Link
+                href="#"
+                className="rounded-xl border border-border p-3 transition hover:bg-muted"
+              >
+                <FaLinkedinIn className="h-5 w-5" />
+              </Link>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-border py-6 text-sm text-muted-foreground md:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-6 text-sm text-muted-foreground md:flex-row">
           <p>
             © {new Date().getFullYear()} Edurefer. All rights reserved.
           </p>
 
-          <p>
-            Powered by{" "}
-            <span className="font-medium text-primary">
-              ITE Tech Solutions
-            </span>
-          </p>
+          <div className="flex gap-6">
+            <Link
+              href="/privacy-policy"
+              className="hover:text-primary"
+            >
+              Privacy
+            </Link>
+
+            <Link
+              href="/terms"
+              className="hover:text-primary"
+            >
+              Terms
+            </Link>
+
+            <Link
+              href="/contact"
+              className="hover:text-primary"
+            >
+              Contact
+            </Link>
+          </div>
         </div>
-      </Container>
+      </div>
     </footer>
   );
 }

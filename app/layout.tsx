@@ -1,21 +1,27 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import Navbar from "@/components/layout/navbar";
-import Footer from "@/components/layout/footer";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://edurefertech.com"),
+
+  category: "Education",
+
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 
   title: {
     default: "Edurefer | Learn. Build. Get Certified. Get Hired.",
@@ -23,11 +29,11 @@ export const metadata: Metadata = {
   },
 
   description:
-    "Edurefer is a modern learning platform offering industry-focused courses, certifications, learning kits, AI-powered learning and 100% Placement Assistance.",
+    "Edurefer is a modern learning platform offering industry-focused courses, certifications, learning kits, AI-powered learning and Placement Assistance.",
 
   keywords: [
     "Edurefer",
-    "ITE Computer Institute",
+    "Online Learning",
     "ITE Tech Solutions",
     "Programming",
     "Full Stack",
@@ -49,25 +55,26 @@ export const metadata: Metadata = {
 
   creator: "Edurefer",
 
-  publisher: "Edurefer",
+  publisher: "ITE Tech Solutions",
 
   applicationName: "Edurefer",
 
   openGraph: {
     title: "Edurefer",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Edurefer",
+      },
+    ],
     description:
       "Learn. Build. Get Certified. Get Hired.",
     url: "https://edurefertech.com",
     siteName: "Edurefer",
     locale: "en_IN",
     type: "website",
-  },
-
-  twitter: {
-    card: "summary_large_image",
-    title: "Edurefer",
-    description:
-      "Learn. Build. Get Certified. Get Hired.",
   },
 
   robots: {
@@ -87,7 +94,7 @@ export default function RootLayout({
       suppressHydrationWarning className={cn("font-sans", geist.variable)}
     >
       <body
-        className={`${inter.variable} antialiased bg-background text-foreground`}
+        className={`${geist.variable} antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
@@ -96,13 +103,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="relative flex min-h-screen flex-col">
-            <Navbar />
-
-            <main className="flex-1">
+            <TooltipProvider>
               {children}
-            </main>
-
-            <Footer />
+              <Toaster richColors position="top-right" />
+            </TooltipProvider>
           </div>
         </ThemeProvider>
       </body>

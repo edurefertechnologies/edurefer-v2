@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -24,54 +25,56 @@ enum UserStatus {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  firstName    String
-  lastName     String?
-  username     String? @unique
-  email        String  @unique
-  phone        String? @unique
-  passwordHash String?
-  avatarUrl    String?
+  id        String   @id @default(cuid())
 
-  role     UserRole     @default(STUDENT)
-  provider AuthProvider @default(CREDENTIALS)
-  status   UserStatus   @default(ACTIVE)
+  // Profile
+  firstName String
+  lastName  String?
+  name      String?
+  username  String?  @unique
+  email     String   @unique
+  phone     String?  @unique
+  image     String?
 
-  emailVerifiedAt DateTime?
+  // Auth
+  emailVerified Boolean @default(false)
+  provider      AuthProvider @default(CREDENTIALS)
 
-  referralCode String  @unique
+  // System
+  role   UserRole   @default(STUDENT)
+  status UserStatus @default(ACTIVE)
+
+  // Referral
+  referralCode String? @unique
+
   referredById String?
-  referredBy   User?   @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals    User[]  @relation("UserReferrals")
+  referredBy   User?  @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals    User[] @relation("UserReferrals")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  isDeleted Boolean   @default(false)
   lastLogin DateTime?
 
-  orders Order[]
+  isDeleted Boolean @default(false)
 
-  wallet Wallet?
+  sessions Session[]
+  accounts Account[]
 
-  referralsMade Referral[] @relation("ReferralOwner")
-  referredUsers Referral[] @relation("ReferralUser")
-
-  enrollments Enrollment[]
-
-  createdProducts Product[] @relation("ProductsCreated")
-  updatedProducts Product[] @relation("ProductsUpdated")
-
-  aiWallet AIWallet?
-
-  aiConversations AIConversation[]
-
-  notifications Notification[]
-
-  auditLogs AuditLog[]
+  orders            Order[]
+  wallet            Wallet?
+  referralsMade     Referral[] @relation("ReferralOwner")
+  referredUsers     Referral[] @relation("ReferralUser")
+  enrollments       Enrollment[]
+  createdProducts   Product[] @relation("ProductsCreated")
+  updatedProducts   Product[] @relation("ProductsUpdated")
+  aiWallet          AIWallet?
+  aiConversations   AIConversation[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
 
   @@index([email])
   @@index([referralCode])
+  @@map("user")
 }
 
 enum ProductType {
@@ -522,12 +525,12 @@ enum AIService {
 }
 
 model AIWallet {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  balance   Int      @default(0)
+  balance Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -542,54 +545,54 @@ enum AITransactionType {
 }
 
 model AITransaction {
-  id          String            @id @default(cuid())
+  id String @id @default(cuid())
 
-  walletId    String
-  wallet      AIWallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId String
+  wallet   AIWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
-  type        AITransactionType
+  type AITransactionType
 
-  credits     Int
+  credits Int
 
   description String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([walletId])
 }
 
 model AIConversation {
-  id         String    @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId     String
-  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  service    AIService
+  service AIService
 
-  title      String?
+  title String?
 
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  usages      AIUsage[]
+  usages AIUsage[]
 }
 
 model AIUsage {
-  id               String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  walletId         String
-  wallet           AIWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId String
+  wallet   AIWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
-  conversationId   String?
-  conversation     AIConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+  conversationId String?
+  conversation   AIConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
 
-  creditsUsed      Int
+  creditsUsed Int
 
   promptTokens     Int?
   completionTokens Int?
   totalTokens      Int?
 
-  createdAt        DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([walletId])
   @@index([conversationId])
@@ -603,59 +606,107 @@ enum NotificationType {
 }
 
 model Notification {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title       String
-  message     String
+  title   String
+  message String
 
-  type        NotificationType @default(INFO)
+  type NotificationType @default(INFO)
 
-  isRead      Boolean @default(false)
+  isRead Boolean @default(false)
 
-  actionUrl   String?
+  actionUrl String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }
 
 model Setting {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  key         String   @unique
+  key String @unique
 
-  value       Json
+  value Json
 
   description String?
 
-  updatedAt   DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
 model AuditLog {
-  id          String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  action      String
+  action String
 
-  entity      String
+  entity String
 
-  entityId    String?
+  entityId String?
 
-  oldData     Json?
+  oldData Json?
 
-  newData     Json?
+  newData Json?
 
-  ipAddress   String?
+  ipAddress String?
 
-  userAgent   String?
+  userAgent String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([entity])
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }

@@ -7,6 +7,26 @@ import { ArrowRight, BookOpen, Briefcase, Award } from "lucide-react";
 import Container from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 
+const heroData = {
+  user: {
+    firstName: "Learner",
+  },
+  subscription: {
+    planName: "Free",
+  },
+  dashboard: {
+    totalCourses: 20,
+    totalPdfKits: 50,
+    aiCredits: 300,
+    progress: 78,
+    wallet: 0,
+  },
+  bundle: {
+    originalPrice: 6500,
+    discountPrice: 5500,
+  },
+};
+
 const stats = [
   {
     icon: BookOpen,
@@ -94,7 +114,7 @@ export default function Hero() {
                   </p>
 
                   <h3 className="text-xl font-bold">
-                    Welcome, {user?.firstName ?? "Learner"} 👋
+                    Welcome, {heroData.user.firstName} 👋
                   </h3>
 
                   <p className="text-sm text-muted-foreground">
@@ -103,7 +123,7 @@ export default function Hero() {
                 </div>
 
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                  {subscription?.planName ?? "Free"}
+                  {heroData.subscription.planName}
                 </span>
               </div>
 
@@ -114,7 +134,9 @@ export default function Hero() {
                     AI Courses
                   </p>
 
-                  value={dashboard?.totalCourses?.toString() ?? "0"}
+                  <h4 className="mt-2 text-2xl font-bold">
+                    {heroData.dashboard.totalCourses}
+                  </h4>
                 </div>
 
                 <div className="rounded-xl border p-4">
@@ -123,7 +145,7 @@ export default function Hero() {
                   </p>
 
                   <h4 className="mt-2 text-2xl font-bold">
-                    value={dashboard?.totalPdfKits?.toString() ?? "0"}
+                    {heroData.dashboard.totalPdfKits}
                   </h4>
                 </div>
 
@@ -133,7 +155,7 @@ export default function Hero() {
                   </p>
 
                   <h4 className="mt-2 text-2xl font-bold">
-                    value={dashboard?.aiCredits?.toString() ?? "0"}
+                    {heroData.dashboard.aiCredits}
                   </h4>
                 </div>
 
@@ -143,7 +165,7 @@ export default function Hero() {
                   </p>
 
                   <h4 className="mt-2 text-2xl font-bold">
-                    ₹500
+                    ₹{heroData.dashboard.wallet}
                   </h4>
                 </div>
 
@@ -152,11 +174,16 @@ export default function Hero() {
               <div>
                 <div className="mb-2 flex justify-between text-sm">
                   <span>Learning Progress</span>
-                  <span>{dashboard?.progress ?? 0}%</span>
+                  <span>{heroData.dashboard.progress}%</span>
                 </div>
 
                 <div className="h-3 overflow-hidden rounded-full bg-muted">
-                  <div className="h-full w-[78%] rounded-full bg-primary" />
+                  <div
+                    className="h-full rounded-full bg-primary transition-all duration-700"
+                    style={{
+                      width: `${heroData.dashboard.progress}%`,
+                    }}
+                  />
                 </div>
               </div>
 
@@ -172,11 +199,11 @@ export default function Hero() {
 
                 <div className="mt-3 flex items-center gap-3">
                   <span className="text-2xl font-bold">
-                    ₹{bundle?.discountPrice}
+                    ₹{heroData.bundle.discountPrice}
                   </span>
 
                   <span className="text-sm line-through text-muted-foreground">
-                    ₹{bundle?.discountPrice}
+                    ₹{heroData.bundle.originalPrice}
                   </span>
                 </div>
               </div>
