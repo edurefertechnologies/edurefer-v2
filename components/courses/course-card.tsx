@@ -4,10 +4,10 @@ import Link from "next/link";
 import { Clock, Star, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Course } from "@/data/courses";
+import type { CourseCardType } from "@/types/course";
 
 interface Props {
-  course: Course;
+  course: CourseCardType;
 }
 
 export default function CourseCard({
@@ -33,18 +33,18 @@ export default function CourseCard({
 
         <div className="flex items-center gap-2">
           <Users size={16} />
-          {course.students.toLocaleString()} Students
+          {course.enrollments.length} Students
         </div>
 
         <div className="flex items-center gap-2">
           <Star size={16} />
-          {course.rating}
+          New Course
         </div>
       </div>
 
       <div className="mt-8 flex items-center justify-between">
         <span className="text-2xl font-bold">
-          ₹{course.price.toLocaleString()}
+          ₹{Number(course.product.price).toLocaleString()}
         </span>
 
         <Link href={`/courses/${course.slug}`}>

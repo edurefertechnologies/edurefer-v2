@@ -3,6 +3,8 @@
 import { CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/container";
+import type { CourseDetailsType } from "@/types/course";
+import Link from "next/link";
 
 const features = [
   "Lifetime Access",
@@ -13,7 +15,13 @@ const features = [
   "100% Placement Assistance",
 ];
 
-export default function PricingCard() {
+interface Props {
+  course: CourseDetailsType;
+}
+
+export default function PricingCard({
+  course,
+}: Props) {
   return (
     <section className="section">
       <Container>
@@ -60,7 +68,7 @@ export default function PricingCard() {
                   </p>
 
                   <h3 className="mt-2 text-5xl font-bold text-primary">
-                    ₹2999
+                    ₹₹{Number(course.product.price).toLocaleString()}
                   </h3>
 
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -68,13 +76,15 @@ export default function PricingCard() {
                   </p>
                 </div>
 
-                <Button
-                  size="lg"
-                  className="mt-8 w-full"
-                >
-                  <CreditCard className="mr-2 h-5 w-5" />
-                  Enroll Now
-                </Button>
+                <Link href={`/checkout/${course.slug}`}>
+                  <Button
+                    size="lg"
+                    className="mt-8 w-full"
+                  >
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Enroll Now
+                  </Button>
+                </Link>
 
                 <Button
                   variant="outline"
@@ -104,7 +114,7 @@ export default function PricingCard() {
                 <div className="mt-6 space-y-2 text-sm text-muted-foreground">
                   <div className="flex justify-between">
                     <span>Duration</span>
-                    <span>24 Weeks</span>
+                    <span>{course.duration ?? "Self Paced"}</span>
                   </div>
 
                   <div className="flex justify-between">

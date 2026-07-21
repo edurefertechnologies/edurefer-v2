@@ -5,6 +5,8 @@ import { getPublishedCourses } from "@/lib/course";
 export default async function CoursesPage() {
   const courses = await getPublishedCourses();
 
+  console.log("Published Courses:", courses);
+
   return (
     <>
       <CourseHero />

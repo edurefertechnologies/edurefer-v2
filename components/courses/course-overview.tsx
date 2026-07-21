@@ -3,6 +3,7 @@
 import { CheckCircle2 } from "lucide-react";
 
 import Container from "@/components/layout/container";
+import type { CourseDetailsType } from "@/types/course";
 
 const highlights = [
   "Industry-designed curriculum",
@@ -26,7 +27,13 @@ const audience = [
   "Career Switchers",
 ];
 
-export default function CourseOverview() {
+interface Props {
+  course: CourseDetailsType;
+}
+
+export default function CourseOverview({
+  course,
+}: Props) {
   return (
     <section className="section">
       <Container>
@@ -38,11 +45,7 @@ export default function CourseOverview() {
             </h2>
 
             <p className="mt-6 leading-8 text-muted-foreground">
-              This program is designed to help learners become
-              industry-ready by combining theoretical concepts with
-              practical implementation. You'll work on real-world
-              applications, build a strong portfolio, and gain
-              confidence through hands-on learning.
+              {course.description}
             </p>
 
             <div className="mt-10">

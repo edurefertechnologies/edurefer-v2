@@ -9,70 +9,15 @@ import {
 
 import { BookOpen, Clock3 } from "lucide-react";
 import Container from "@/components/layout/container";
+import type { CourseDetailsType } from "@/types/course";
 
-const curriculum = [
-  {
-    module: "Module 1 - HTML & CSS Fundamentals",
-    duration: "2 Weeks",
-    lessons: [
-      "Introduction to Web Development",
-      "HTML5 Basics",
-      "Forms & Tables",
-      "CSS Fundamentals",
-      "Flexbox & Grid",
-      "Responsive Design",
-    ],
-  },
-  {
-    module: "Module 2 - JavaScript Essentials",
-    duration: "3 Weeks",
-    lessons: [
-      "Variables & Data Types",
-      "Functions",
-      "Arrays & Objects",
-      "DOM Manipulation",
-      "Events",
-      "Async JavaScript",
-    ],
-  },
-  {
-    module: "Module 3 - React.js",
-    duration: "4 Weeks",
-    lessons: [
-      "JSX",
-      "Components",
-      "Props",
-      "State",
-      "Hooks",
-      "Routing",
-    ],
-  },
-  {
-    module: "Module 4 - Next.js",
-    duration: "3 Weeks",
-    lessons: [
-      "App Router",
-      "Layouts",
-      "Server Components",
-      "Client Components",
-      "SEO",
-      "Deployment",
-    ],
-  },
-  {
-    module: "Module 5 - Backend Development",
-    duration: "5 Weeks",
-    lessons: [
-      "Node.js",
-      "Express.js",
-      "REST APIs",
-      "Authentication",
-      "PostgreSQL",
-      "Prisma ORM",
-    ],
-  },
-];
-export default function Curriculum() {
+interface Props {
+  course: CourseDetailsType;
+}
+
+export default function Curriculum({
+  course,
+}: Props) {
   return (
     <section className="section">
       <Container>
@@ -90,7 +35,7 @@ export default function Curriculum() {
           <Accordion
             className="space-y-4"
           >
-            {curriculum.map((item, index) => (
+            {course.modules.map((item, index) => (
               <AccordionItem
                 key={index}
                 value={`module-${index}`}
@@ -102,13 +47,13 @@ export default function Curriculum() {
                       <BookOpen className="h-5 w-5 text-primary" />
 
                       <span className="font-semibold">
-                        {item.module}
+                        {item.title}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock3 className="h-4 w-4" />
-                      {item.duration}
+                      {item.lessons.length} Lessons
                     </div>
                   </div>
                 </AccordionTrigger>
@@ -117,12 +62,12 @@ export default function Curriculum() {
                   <ul className="mt-4 space-y-3">
                     {item.lessons.map((lesson) => (
                       <li
-                        key={lesson}
+                        key={lesson.id}
                         className="flex items-center gap-3"
                       >
                         <div className="h-2 w-2 rounded-full bg-primary" />
 
-                        {lesson}
+                        {lesson.title}
                       </li>
                     ))}
                   </ul>

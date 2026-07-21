@@ -51,7 +51,16 @@ const outcomes = [
   },
 ];
 
-export default function LearningOutcomes() {
+import type { CourseDetailsType } from "@/types/course";
+
+interface Props {
+  course: CourseDetailsType;
+}
+
+export default function LearningOutcomes({
+  course,
+}: Props) {
+  void course;
   return (
     <section className="section">
       <Container>
