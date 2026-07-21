@@ -362,6 +362,7 @@ model Setting {
   value       Json
   description String?
   updatedAt   DateTime @updatedAt
+  
 }
 
 model AuditLog {

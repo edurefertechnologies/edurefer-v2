@@ -10,12 +10,10 @@ interface PaymentButtonProps {
   slug: string;
 }
 
-export default function PaymentButton({
-  slug,
-}: PaymentButtonProps) {
+export default function PaymentButton({ slug }: PaymentButtonProps) {
   const handlePayment = async () => {
     try {
-      const response = await fetch("/api/razorpay/create", {
+      const response = await fetch("/api/orders/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,13 +23,18 @@ export default function PaymentButton({
 
       const data = await response.json();
 
+      if (!data.success) {
+        alert(data.error || "Unable to create order.");
+        return;
+      }
+
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: data.order.amount,
-        currency: data.order.currency,
+        key: data.key,
+        amount: data.razorpayAmount,
+        currency: data.currency,
         name: "Edurefer Technologies LLP",
-        description: data.course.title,
-        order_id: data.order.id,
+        description: "Course Purchase",
+        order_id: data.razorpayOrderId,
 
         handler: async function (response: any) {
           try {
@@ -50,22 +53,14 @@ export default function PaymentButton({
             const result = await verifyResponse.json();
 
             if (result.success) {
-              alert("✅ Payment Verified Successfully");
-              console.log(result);
+              window.location.href = "/payment/success";
             } else {
-              alert("❌ Payment Verification Failed");
-              console.error(result);
+              alert(result.error || "Payment verification failed.");
             }
           } catch (error) {
             console.error(error);
-            alert("Something went wrong");
+            alert("Verification failed.");
           }
-        },
-
-        prefill: {
-          name: "",
-          email: "",
-          contact: "",
         },
 
         theme: {
@@ -77,6 +72,7 @@ export default function PaymentButton({
       razorpay.open();
     } catch (error) {
       console.error(error);
+      alert("Something went wrong.");
     }
   };
 

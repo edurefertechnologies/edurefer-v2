@@ -1,16 +1,16 @@
-import { NextRequest, NextResponse } from "next/server";
-
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { razorpay } from "@/lib/razorpay";
 import { getSession } from "@/lib/auth-server";
+import { generateOrderNumber } from "@/lib/order";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const session = await getSession();
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { success: false, error: "Unauthorized" },
         { status: 401 }
       );
     }
@@ -19,15 +19,13 @@ export async function POST(req: NextRequest) {
 
     if (!slug) {
       return NextResponse.json(
-        { error: "Course slug is required" },
+        { success: false, error: "Course slug is required" },
         { status: 400 }
       );
     }
 
     const course = await prisma.course.findUnique({
-      where: {
-        slug,
-      },
+      where: { slug },
       include: {
         product: true,
       },
@@ -35,51 +33,115 @@ export async function POST(req: NextRequest) {
 
     if (!course || !course.product) {
       return NextResponse.json(
-        { error: "Course not found" },
+        { success: false, error: "Course not found" },
         { status: 404 }
       );
     }
 
-    const existingEnrollment =
-      await prisma.enrollment.findUnique({
-        where: {
-          userId_courseId: {
-            userId: session.user.id,
-            courseId: course.id,
-          },
+    const existingEnrollment = await prisma.enrollment.findUnique({
+      where: {
+        userId_courseId: {
+          userId: session.user.id,
+          courseId: course.id,
         },
-      });
+      },
+    });
 
     if (existingEnrollment) {
       return NextResponse.json(
         {
+          success: false,
           error: "You already own this course.",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
+    const amount =
+      Number(course.product.discountPrice ?? course.product.price);
+
+    const result = await prisma.$transaction(async (tx) => {
+      const order = await tx.order.create({
+        data: {
+          orderNumber: generateOrderNumber(),
+          userId: session.user.id,
+          subtotal: amount,
+          discount: 0,
+          tax: 0,
+          total: amount,
+          currency: "INR",
+        }
+      });
+
+      await tx.orderItem.create({
+        data: {
+          orderId: order.id,
+          productId: course.product.id,
+          quantity: 1,
+          unitPrice: amount,
+          totalPrice: amount,
+        },
+      });
+
+      const payment = await tx.payment.create({
+        data: {
+          orderId: order.id,
+          amount,
+          currency: "INR",
+        },
+      });
+
+      return {
+        order,
+        payment,
+      };
+    },
+      {
+        timeout: 15000, // 15 seconds
+      });
+
+    const razorpayOrder = await razorpay.orders.create({
+      amount: Math.round(amount * 100),
+      currency: "INR",
+      receipt: result.order.orderNumber,
+      notes: {
+        orderId: result.order.id,
+        userId: session.user.id,
+        courseId: course.id,
+      },
+    });
+
+    await prisma.payment.update({
+      where: {
+        id: result.payment.id,
+      },
+      data: {
+        razorpayOrderId: razorpayOrder.id,
+      },
+    });
+
     return NextResponse.json({
       success: true,
-      message: "Validation successful",
-      course: {
-        id: course.id,
-        title: course.title,
-        price: Number(course.product.price),
-      },
+
+      orderId: result.order.id,
+
+      razorpayOrderId: razorpayOrder.id,
+
+      razorpayAmount: razorpayOrder.amount,
+
+      currency: razorpayOrder.currency,
+
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
       {
-        error: "Internal Server Error",
+        success: false,
+        error: "Something went wrong.",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
