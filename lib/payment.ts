@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { REFERRAL } from "@/lib/constants";
 
 interface CompletePaymentParams {
   razorpayOrderId: string;
@@ -90,8 +91,6 @@ export async function completePayment({
       });
     }
 
-    const REFERRAL_REWARD = 300;
-
     const referral = await tx.referral.findUnique({
       where: {
         refereeId: payment.order.userId,
@@ -112,7 +111,7 @@ export async function completePayment({
           },
           data: {
             balance: {
-              increment: REFERRAL_REWARD,
+              increment: REFERRAL.REWARD,
             },
           },
         });
@@ -120,7 +119,7 @@ export async function completePayment({
         await tx.walletTransaction.create({
           data: {
             walletId: wallet.id,
-            amount: REFERRAL_REWARD,
+            amount: REFERRAL.REWARD,
             type: "CREDIT",
             description: `Referral bonus for order ${payment.order.orderNumber}`,
           },

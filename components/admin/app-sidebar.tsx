@@ -1,0 +1,115 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  Package,
+  ShoppingCart,
+  Wallet,
+  Gift,
+  Landmark,
+  BarChart3,
+  Settings,
+} from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+const navItems = [
+  {
+    title: "Dashboard",
+    href: "/admin",
+    icon: LayoutDashboard,
+  },
+  {
+    title: "Users",
+    href: "/users",
+    icon: Users,
+  },
+  {
+    title: "Products",
+    href: "/products",
+    icon: Package,
+  },
+  {
+    title: "Courses",
+    href: "/courses",
+    icon: BookOpen,
+  },
+  {
+    title: "Orders",
+    href: "/orders",
+    icon: ShoppingCart,
+  },
+  {
+    title: "Wallets",
+    href: "/wallets",
+    icon: Wallet,
+  },
+  {
+    title: "Referrals",
+    href: "/referrals",
+    icon: Gift,
+  },
+  {
+    title: "Withdrawals",
+    href: "/withdrawals",
+    icon: Landmark,
+  },
+  {
+    title: "Analytics",
+    href: "/analytics",
+    icon: BarChart3,
+  },
+  {
+    title: "Settings",
+    href: "/settings",
+    icon: Settings,
+  },
+];
+
+export function AppSidebar() {
+  const pathname = usePathname();
+
+  return (
+    <aside className="w-72 border-r bg-background h-screen sticky top-0">
+      <div className="border-b p-6">
+        <h1 className="text-2xl font-bold">
+          Edurefer
+        </h1>
+
+        <p className="text-sm text-muted-foreground">
+          Admin Panel
+        </p>
+      </div>
+
+      <nav className="p-4 space-y-2">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+
+          const active =
+            pathname === item.href ||
+            pathname.startsWith(item.href + "/");
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-4 py-3 transition-colors",
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+              <span>{item.title}</span>
+            </Link>
+          );
+        })}
+      </nav>
+    </aside>
+  );
+}
