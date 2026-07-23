@@ -1,4 +1,10 @@
-export default function UsersPage() {
+import { getUsers } from "@/actions/admin/users/get-users";
+import UsersTable from "@/components/admin/users/users-table";
+import CreateUserDialog from "@/components/admin/users/create-user-dialog";
+
+export default async function UsersPage() {
+  const users = await getUsers();
+
   return (
     <div className="space-y-6">
       <div>
@@ -10,6 +16,9 @@ export default function UsersPage() {
           Manage all registered users.
         </p>
       </div>
+
+      <UsersTable users={users} />
+      <CreateUserDialog />
     </div>
   );
 }
