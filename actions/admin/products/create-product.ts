@@ -38,6 +38,8 @@ export async function createProduct(values: unknown) {
         description: data.description || null,
         shortDescription: data.shortDescription || null,
 
+        thumbnail: data.thumbnail || null,
+
         price: data.price,
 
         discountPrice:

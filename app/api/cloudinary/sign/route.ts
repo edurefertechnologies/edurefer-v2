@@ -1,0 +1,36 @@
+import { NextResponse } from "next/server";
+import cloudinary from "@/lib/cloudinary";
+
+export async function POST() {
+  try {
+    const timestamp = Math.round(Date.now() / 1000);
+
+    const folder = "edurefer/products";
+
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp,
+        folder,
+      },
+      process.env.CLOUDINARY_API_SECRET!
+    );
+
+    return NextResponse.json({
+      signature,
+      timestamp,
+      folder,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+    });
+  } catch (error) {
+    console.error("CLOUDINARY_SIGNATURE_ERROR:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Failed to generate upload signature",
+      },
+      { status: 500 }
+    );
+  }
+}

@@ -1,5 +1,7 @@
 import { getProducts } from "@/actions/admin/products/get-products";
 import ProductsTable from "@/components/admin/products/products-table";
+import Link from "next/link";
+import CreateProductDialog from "@/components/admin/products/create-product-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
@@ -19,10 +21,15 @@ export default async function ProductsPage() {
           </p>
         </div>
 
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Product
-        </Button>
+        <Button
+          nativeButton={false}
+          render={
+            <Link href="/admin/products/new">
+              <Plus className="mr-2 h-4 w-4" />
+              Create Product
+            </Link>
+          }
+        />
       </div>
 
       <ProductsTable products={products} />

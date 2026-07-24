@@ -120,6 +120,7 @@ export const columns: ColumnDef<ProductColumn>[] = [
     cell: ({ row }) => (
       <ProductActions
         productId={row.original.id}
+        status={row.original.status}
       />
     ),
   },

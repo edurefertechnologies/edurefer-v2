@@ -25,47 +25,47 @@ const navItems = [
   },
   {
     title: "Users",
-    href: "/users",
+    href: "/admin/users",
     icon: Users,
   },
   {
     title: "Products",
-    href: "/products",
+    href: "/admin/products",
     icon: Package,
   },
   {
     title: "Courses",
-    href: "/courses",
+    href: "/admin/courses",
     icon: BookOpen,
   },
   {
     title: "Orders",
-    href: "/orders",
+    href: "/admin/orders",
     icon: ShoppingCart,
   },
   {
     title: "Wallets",
-    href: "/wallets",
+    href: "/admin/wallets",
     icon: Wallet,
   },
   {
     title: "Referrals",
-    href: "/referrals",
+    href: "/admin/referrals",
     icon: Gift,
   },
   {
     title: "Withdrawals",
-    href: "/withdrawals",
+    href: "/admin/withdrawals",
     icon: Landmark,
   },
   {
     title: "Analytics",
-    href: "/analytics",
+    href: "/admin/analytics",
     icon: BarChart3,
   },
   {
     title: "Settings",
-    href: "/settings",
+    href: "/admin/settings",
     icon: Settings,
   },
 ];
@@ -90,8 +90,10 @@ export function AppSidebar() {
           const Icon = item.icon;
 
           const active =
-            pathname === item.href ||
-            pathname.startsWith(item.href + "/");
+            item.href === "/admin"
+              ? pathname === "/admin"
+              : pathname === item.href ||
+              pathname.startsWith(item.href + "/");
 
           return (
             <Link

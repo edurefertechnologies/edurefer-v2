@@ -22,6 +22,12 @@ export const createProductSchema = z.object({
     .nullable()
     .optional(),
 
+  thumbnail: z
+    .string()
+    .url("Invalid thumbnail URL")
+    .nullable()
+    .optional(),
+
   type: z.enum([
     "PDF",
     "COURSE",
