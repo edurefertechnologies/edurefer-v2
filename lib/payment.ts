@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
-import { OrderStatus, PaymentStatus } from "@prisma/client";
+import { OrderStatus, PaymentStatus, NotificationType } from "@prisma/client";
 import { REFERRAL } from "@/lib/constants";
+
+import { createNotificationTx } from "@/lib/notifications";
 
 interface CompletePaymentParams {
   razorpayOrderId: string;
@@ -89,6 +91,14 @@ export async function completePayment({
           orderId: payment.order.id,
         },
       });
+
+      await createNotificationTx(tx, {
+        userId: payment.order.userId,
+        title: "Course Enrollment Successful",
+        message: `You have successfully enrolled in ${course.title}.`,
+        type: NotificationType.SUCCESS,
+        actionUrl: `/learn/${course.slug}`,
+      });
     }
 
     const referral = await tx.referral.findUnique({
@@ -109,6 +119,7 @@ export async function completePayment({
           where: {
             id: wallet.id,
           },
+
           data: {
             balance: {
               increment: REFERRAL.REWARD,
@@ -124,15 +135,25 @@ export async function completePayment({
             description: `Referral bonus for order ${payment.order.orderNumber}`,
           },
         });
+
+        await createNotificationTx(tx, {
+          userId: referral.referrerId,
+          title: "Referral Reward Credited",
+          message: `₹${REFERRAL.REWARD} referral reward has been credited to your wallet.`,
+          type: NotificationType.SUCCESS,
+          actionUrl: "/wallet",
+        });
       }
 
       await tx.referral.update({
         where: {
           id: referral.id,
         },
+
         data: {
           isRewarded: true,
-          rewardedOrderId: payment.order.id,
+          rewardedOrderId:
+            payment.order.id,
           rewardedAt: new Date(),
         },
       });

@@ -2,10 +2,14 @@
 
 import crypto from "crypto";
 import { revalidatePath } from "next/cache";
-import { EnrollmentStatus } from "@prisma/client";
+import {
+  EnrollmentStatus,
+  NotificationType,
+} from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { createNotificationTx } from "@/lib/notifications";
 
 export async function completeLesson(
   enrollmentId: string,
@@ -36,6 +40,7 @@ export async function completeLesson(
           course: {
             select: {
               slug: true,
+              title: true,
 
               modules: {
                 select: {
@@ -147,13 +152,17 @@ export async function completeLesson(
         },
       });
 
-      // 5. Generate certificate record
-      // only after 100% course completion
+      // 5. Generate certificate only once
       if (isCompleted) {
         const existingCertificate =
           await tx.certificate.findUnique({
             where: {
               enrollmentId,
+            },
+
+            select: {
+              id: true,
+              certificateNo: true,
             },
           });
 
@@ -165,11 +174,23 @@ export async function completeLesson(
               .slice(0, 10)
               .toUpperCase()}`;
 
-          await tx.certificate.create({
-            data: {
-              enrollmentId,
-              certificateNo,
-            },
+          const certificate =
+            await tx.certificate.create({
+              data: {
+                enrollmentId,
+                certificateNo,
+              },
+            });
+
+          // Notification is also created only once
+          await createNotificationTx(tx, {
+            userId: session.user.id,
+            title: "Certificate Earned",
+            message: `Congratulations! You have successfully completed ${enrollment.course.title}. Your certificate is now available.`,
+            type: NotificationType.SUCCESS,
+            actionUrl: `/api/certificates/${encodeURIComponent(
+              certificate.certificateNo
+            )}/download`,
           });
         }
       }
@@ -181,6 +202,7 @@ export async function completeLesson(
 
     revalidatePath("/my-courses");
     revalidatePath("/dashboard");
+    revalidatePath("/notifications");
 
     return {
       success: true,

@@ -1,7 +1,6 @@
 import { getProducts } from "@/actions/admin/products/get-products";
 import ProductsTable from "@/components/admin/products/products-table";
 import Link from "next/link";
-import CreateProductDialog from "@/components/admin/products/create-product-dialog";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 

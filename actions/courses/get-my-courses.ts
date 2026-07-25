@@ -25,6 +25,15 @@ export async function getMyCourses() {
       enrolledAt: true,
       completedAt: true,
 
+      certificate: {
+        select: {
+          id: true,
+          certificateNo: true,
+          issuedAt: true,
+          pdfUrl: true,
+        },
+      },
+
       lessonProgress: {
         where: {
           completed: true,

@@ -9,6 +9,9 @@ import CourseFaq from "@/components/courses/course-faq";
 import RelatedCourses from "@/components/courses/related-courses";
 import CourseDetailsHero from "@/components/courses/course-details-hero";
 import { getSession } from "@/lib/auth-server";
+import CourseReviews from "@/components/courses/course-reviews";
+import { getCourseReviews } from "@/actions/courses/get-course-reviews";
+import { isCourseWishlisted } from "@/actions/courses/is-course-wishlisted";
 
 import { prisma } from "@/lib/prisma";
 
@@ -51,6 +54,12 @@ export default async function CourseDetailsPage({
     notFound();
   }
 
+  const reviewData =
+    await getCourseReviews(courseData.id);
+
+  const isWishlisted =
+    await isCourseWishlisted(courseData.id);
+
   const session = await getSession();
 
   const enrollment = session?.user?.id
@@ -85,6 +94,9 @@ export default async function CourseDetailsPage({
     <><CourseDetailsHero
       course={course}
       enrollmentStatus={enrollmentStatus}
+      averageRating={reviewData.averageRating}
+      reviewCount={reviewData.reviewCount}
+      isWishlisted={isWishlisted}
     />
 
       <CourseOverview course={course} />
@@ -98,6 +110,15 @@ export default async function CourseDetailsPage({
       />
 
       <CourseFaq course={course} />
+
+      <CourseReviews
+        courseId={courseData.id}
+        reviews={reviewData.reviews}
+        averageRating={reviewData.averageRating}
+        reviewCount={reviewData.reviewCount}
+        myReview={reviewData.myReview}
+        canReview={reviewData.canReview}
+      />
 
       <RelatedCourses
         currentCourseId={course.id}

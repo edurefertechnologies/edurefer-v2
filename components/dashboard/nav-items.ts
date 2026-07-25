@@ -1,8 +1,10 @@
 import {
+  Bell,
   BookOpen,
+  Bookmark,
+  GraduationCap,
   Brain,
   CreditCard,
-  GraduationCap,
   Home,
   Package,
   Settings,
@@ -20,6 +22,16 @@ export const navItems = [
     title: "Courses",
     href: "/courses",
     icon: BookOpen,
+  },
+  {
+    title: "Saved Courses",
+    href: "/saved-courses",
+    icon: Bookmark,
+  },
+  {
+    title: "Notifications",
+    href: "/notifications",
+    icon: Bell,
   },
   {
     title: "My Courses",

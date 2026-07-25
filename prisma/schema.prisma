@@ -41,6 +41,8 @@ model User {
   sessions        Session[]
   referredBy      User?            @relation("UserReferrals", fields: [referredById], references: [id])
   referrals       User[]           @relation("UserReferrals")
+  courseReviews   CourseReview[]
+  wishlists       CourseWishlist[]
 
   @@index([email])
   @@index([referralCode])
@@ -171,17 +173,16 @@ model Payment {
 }
 
 model LessonProgress {
-  id             String    @id @default(cuid())
+  id             String     @id @default(cuid())
   enrollmentId   String
   lessonId       String
-  completed      Boolean   @default(false)
-  watchedSeconds Int       @default(0)
+  completed      Boolean    @default(false)
+  watchedSeconds Int        @default(0)
   completedAt    DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  lesson     Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  enrollment     Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  lesson         Lesson     @relation(fields: [lessonId], references: [id], onDelete: Cascade)
 
   @@unique([enrollmentId, lessonId])
   @@index([enrollmentId])
@@ -237,20 +238,22 @@ model Withdrawal {
 }
 
 model Course {
-  id          String         @id @default(cuid())
-  productId   String         @unique
+  id          String           @id @default(cuid())
+  productId   String           @unique
   title       String
-  slug        String         @unique
+  slug        String           @unique
   description String?
   level       CourseLevel?
   duration    String?
   thumbnail   String?
-  status      CourseStatus   @default(DRAFT)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  product     Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  status      CourseStatus     @default(DRAFT)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  product     Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   modules     CourseModule[]
   enrollments Enrollment[]
+  reviews     CourseReview[]
+  wishlists   CourseWishlist[]
 
   @@index([slug])
 }
@@ -274,13 +277,13 @@ model Lesson {
   description   String?
   videoUrl      String?
   videoDuration Int?
-  progress      LessonProgress[]
   attachmentUrl String?
   duration      Int?
   isPreview     Boolean          @default(false)
   sortOrder     Int
   createdAt     DateTime         @default(now())
   module        CourseModule     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress      LessonProgress[]
 
   @@index([moduleId])
 }
@@ -293,12 +296,12 @@ model Enrollment {
   progress       Float            @default(0)
   status         EnrollmentStatus @default(ACTIVE)
   enrolledAt     DateTime         @default(now())
-  lessonProgress LessonProgress[]
   completedAt    DateTime?
   certificate    Certificate?
   course         Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   order          Order?           @relation(fields: [orderId], references: [id])
   user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonProgress LessonProgress[]
 
   @@unique([userId, courseId])
 }
@@ -310,6 +313,37 @@ model Certificate {
   issuedAt      DateTime   @default(now())
   pdfUrl        String?
   enrollment    Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+}
+
+model CourseReview {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([courseId])
+  @@index([userId])
+}
+
+model CourseWishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
 }
 
 model AIWallet {

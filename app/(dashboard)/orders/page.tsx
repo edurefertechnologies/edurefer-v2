@@ -88,7 +88,7 @@ export default async function OrdersPage() {
                     <p className="mt-2 text-sm text-muted-foreground">
                       {new Date(
                         order.payment?.paidAt ??
-                          order.createdAt
+                        order.createdAt
                       ).toLocaleDateString("en-IN", {
                         day: "2-digit",
                         month: "short",
@@ -146,17 +146,24 @@ export default async function OrdersPage() {
                   </div>
                 )}
 
-                {paid && (
-                  <div className="mt-5 flex justify-end">
-                    <Link
+                <div className="mt-5 flex flex-col gap-3 border-t pt-5 sm:flex-row sm:justify-end">
+                  <Link
+                    href={`/orders/${order.id}`}
+                    className="inline-flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted"
+                  >
+                    View Details
+                  </Link>
+
+                  {paid && (
+                    <a
                       href={`/api/orders/${order.id}/invoice`}
-                      className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition hover:bg-muted"
+                      className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
                     >
                       <ReceiptText className="h-4 w-4" />
                       Download Invoice
-                    </Link>
-                  </div>
-                )}
+                    </a>
+                  )}
+                </div>
               </article>
             );
           })}

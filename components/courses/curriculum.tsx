@@ -19,7 +19,9 @@ export default function Curriculum({
   course,
 }: Props) {
   return (
-    <section className="section">
+    <section
+      id="curriculum"
+      className="scroll-mt-24 section">
       <Container>
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">

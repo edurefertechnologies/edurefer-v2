@@ -6,7 +6,7 @@ interface CourseCardProps {
   category: string;
   level: string;
   duration: string;
-  students: string;
+  students: number;
 }
 
 export default function CourseCard({
@@ -42,13 +42,13 @@ export default function CourseCard({
 
           <div className="flex items-center gap-2">
             <Users size={16} />
-            {students} Students
+            {students.toLocaleString("en-IN")} Students
           </div>
-        </div>
 
-        <Button className="mt-8 w-full bg-[var(--emerald)] hover:bg-green-700">
-          Explore Course
-        </Button>
+          <Button className="mt-8 w-full bg-[var(--emerald)] hover:bg-green-700">
+            Explore Course
+          </Button>
+        </div>
       </div>
     </div>
   );
