@@ -60,22 +60,27 @@ export default function CourseDetailsHero({
 
               <div className="flex items-center gap-2">
                 <Signal className="h-5 w-5 text-primary" />
-                <span>Beginner</span>
+
+                <span className="capitalize">
+                  {course.level
+                    ? course.level.toLowerCase()
+                    : "All Levels"}
+                </span>
               </div>
-            </div>
 
-            <div className="mt-10 flex gap-4">
-              <Button size="lg">
-                Enroll Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <div className="mt-10 flex gap-4">
+                <Button size="lg">
+                  Enroll Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
 
-              <Button
-                variant="outline"
-                size="lg"
-              >
-                View Curriculum
-              </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                >
+                  View Curriculum
+                </Button>
+              </div>
             </div>
           </motion.div>
 
@@ -102,25 +107,44 @@ export default function CourseDetailsHero({
                   Course Fee
                 </span>
 
-                <span className="text-3xl font-bold text-primary">
-                  ₹{Number(course.product.price).toLocaleString()}
-                </span>
+                <div className="text-right">
+                  {course.product.discountPrice &&
+                    Number(course.product.discountPrice) <
+                    Number(course.product.price) ? (
+                    <>
+                      <span className="text-3xl font-bold text-primary">
+                        ₹
+                        {Number(
+                          course.product.discountPrice
+                        ).toLocaleString()}
+                      </span>
+
+                      <span className="ml-2 text-sm text-muted-foreground line-through">
+                        ₹
+                        {Number(
+                          course.product.price
+                        ).toLocaleString()}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-3xl font-bold text-primary">
+                      ₹
+                      {Number(
+                        course.product.price
+                      ).toLocaleString()}
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">
-                  Duration
-                </span>
-
-                <span>24 Weeks</span>
-              </div>
+              <span>{course.duration || "Self-paced"}</span>
 
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">
                   Mode
                 </span>
 
-                <span>Online / Offline</span>
+                <span>Online</span>
               </div>
 
               <div className="flex items-center justify-between">

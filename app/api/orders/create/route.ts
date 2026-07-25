@@ -57,16 +57,26 @@ export async function POST(req: Request) {
       );
     }
 
-    const amount =
-      Number(course.product.discountPrice ?? course.product.price);
+    const originalPrice = Number(course.product.price);
+
+    const sellingPrice =
+      course.product.discountPrice !== null &&
+        Number(course.product.discountPrice) > 0 &&
+        Number(course.product.discountPrice) < originalPrice
+        ? Number(course.product.discountPrice)
+        : originalPrice;
+
+    const discount = originalPrice - sellingPrice;
+
+    const amount = sellingPrice;
 
     const result = await prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
           userId: session.user.id,
-          subtotal: amount,
-          discount: 0,
+          subtotal: originalPrice,
+          discount,
           tax: 0,
           total: amount,
           currency: "INR",

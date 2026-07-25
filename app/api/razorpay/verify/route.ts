@@ -1,17 +1,35 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { PaymentStatus } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
+import { getSession } from "@/lib/auth-server";
 import { completePayment } from "@/lib/payment";
 
 export async function POST(req: NextRequest) {
   try {
+    // 1. User must be logged in
+    const session = await getSession();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Unauthorized",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
     const {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
     } = await req.json();
 
+    // 2. Validate required fields
     if (
       !razorpay_order_id ||
       !razorpay_payment_id ||
@@ -22,29 +40,74 @@ export async function POST(req: NextRequest) {
           success: false,
           error: "Missing payment details",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
-    const generatedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest("hex");
+    const secret = process.env.RAZORPAY_KEY_SECRET;
 
-    if (generatedSignature !== razorpay_signature) {
+    if (!secret) {
+      console.error(
+        "RAZORPAY_KEY_SECRET is not configured."
+      );
+
       return NextResponse.json(
         {
           success: false,
-          error: "Invalid Signature",
+          error: "Payment configuration error",
         },
-        { status: 400 }
+        {
+          status: 500,
+        }
       );
     }
 
+    // 3. Generate expected Razorpay signature
+    const generatedSignature = crypto
+      .createHmac("sha256", secret)
+      .update(
+        `${razorpay_order_id}|${razorpay_payment_id}`
+      )
+      .digest("hex");
+
+    // 4. Timing-safe signature comparison
+    const generatedBuffer = Buffer.from(
+      generatedSignature,
+      "utf8"
+    );
+
+    const receivedBuffer = Buffer.from(
+      razorpay_signature,
+      "utf8"
+    );
+
+    const validSignature =
+      generatedBuffer.length === receivedBuffer.length &&
+      crypto.timingSafeEqual(
+        generatedBuffer,
+        receivedBuffer
+      );
+
+    if (!validSignature) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid payment signature",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    // 5. Find our payment/order
     const payment = await prisma.payment.findUnique({
       where: {
         razorpayOrderId: razorpay_order_id,
       },
+
       include: {
         order: {
           include: {
@@ -68,16 +131,23 @@ export async function POST(req: NextRequest) {
           success: false,
           error: "Payment not found",
         },
-        { status: 404 }
+        {
+          status: 404,
+        }
       );
     }
 
-    // Idempotency
-    if (payment.status === PaymentStatus.SUCCESS) {
-      return NextResponse.json({
-        success: true,
-        message: "Payment already verified",
-      });
+    // 6. Important ownership check
+    if (payment.order.userId !== session.user.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "You cannot verify this order.",
+        },
+        {
+          status: 403,
+        }
+      );
     }
 
     const course =
@@ -89,10 +159,22 @@ export async function POST(req: NextRequest) {
           success: false,
           error: "Course not found",
         },
-        { status: 404 }
+        {
+          status: 404,
+        }
       );
     }
 
+    // 7. Idempotency
+    if (payment.status === PaymentStatus.SUCCESS) {
+      return NextResponse.json({
+        success: true,
+        message: "Payment already verified",
+        courseSlug: course.slug,
+      });
+    }
+
+    // 8. Complete payment
     await completePayment({
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
@@ -101,15 +183,19 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Payment Verified Successfully",
+      message: "Payment verified successfully",
+      courseSlug: course.slug,
     });
   } catch (error) {
-    console.error(error);
+    console.error(
+      "RAZORPAY_VERIFY_ERROR:",
+      error
+    );
 
     return NextResponse.json(
       {
         success: false,
-        error: "Verification Failed",
+        error: "Payment verification failed",
       },
       {
         status: 500,

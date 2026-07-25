@@ -6,6 +6,8 @@ import {
   MoreHorizontal,
   Pencil,
   Trash2,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,6 +32,7 @@ import {
 
 import { updateLesson } from "@/actions/admin/courses/update-lesson";
 import { deleteLesson } from "@/actions/admin/courses/delete-lesson";
+import { reorderLesson } from "@/actions/admin/courses/reorder-lesson";
 
 type Lesson = {
   id: string;
@@ -46,12 +49,17 @@ interface Props {
   courseId: string;
   moduleId: string;
   lesson: Lesson;
+
+  isFirst: boolean;
+  isLast: boolean;
 }
 
 export default function LessonActions({
   courseId,
   moduleId,
   lesson,
+  isFirst,
+  isLast,
 }: Props) {
   const router = useRouter();
 
@@ -151,6 +159,38 @@ export default function LessonActions({
     }
   }
 
+  async function handleMove(
+    direction: "UP" | "DOWN"
+  ) {
+    try {
+      setLoading(true);
+
+      const result = await reorderLesson(
+        courseId,
+        moduleId,
+        lesson.id,
+        direction
+      );
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success(result.message);
+      router.refresh();
+    } catch (error) {
+      console.error(
+        "REORDER_LESSON_CLIENT_ERROR:",
+        error
+      );
+
+      toast.error("Failed to reorder lesson.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function handleDelete() {
     try {
       setLoading(true);
@@ -193,6 +233,22 @@ export default function LessonActions({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            disabled={isFirst || loading}
+            onClick={() => handleMove("UP")}
+          >
+            <ArrowUp className="mr-2 h-4 w-4" />
+            Move Up
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            disabled={isLast || loading}
+            onClick={() => handleMove("DOWN")}
+          >
+            <ArrowDown className="mr-2 h-4 w-4" />
+            Move Down
+          </DropdownMenuItem>
+
           <DropdownMenuItem
             onClick={() => {
               resetEditForm();

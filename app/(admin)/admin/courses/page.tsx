@@ -9,6 +9,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { getCourses } from "@/actions/admin/courses/get-courses";
+import CourseActions from "@/components/admin/courses/course-actions";
 
 export default async function AdminCoursesPage() {
   const courses = await getCourses();
@@ -155,18 +156,9 @@ export default async function AdminCoursesPage() {
 
                     {/* Actions */}
                     <td className="px-4 py-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        nativeButton={false}
-                        render={
-                          <Link
-                            href={`/admin/courses/${course.id}/curriculum`}
-                            aria-label="Manage curriculum"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Link>
-                        }
+                      <CourseActions
+                        courseId={course.id}
+                        courseTitle={course.title}
                       />
                     </td>
                   </tr>

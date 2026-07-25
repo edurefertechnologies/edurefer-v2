@@ -136,8 +136,12 @@ export async function completePayment({
           rewardedAt: new Date(),
         },
       });
-
-      return updatedPayment;
     }
-  });
+
+    // IMPORTANT: outside referral condition
+    return updatedPayment;
+  },
+    {
+      timeout: 15000, // 15 seconds
+    });
 }

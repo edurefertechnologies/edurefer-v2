@@ -247,6 +247,10 @@ export default async function CurriculumPage({
                               duration: lesson.duration,
                               isPreview: lesson.isPreview,
                             }}
+                            isFirst={lessonIndex === 0}
+                            isLast={
+                              lessonIndex === module.lessons.length - 1
+                            }
                           />
                         </div>
                       )
