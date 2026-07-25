@@ -6,13 +6,17 @@ import {
   BookOpen,
   CheckCircle2,
   ChevronRight,
+  Circle,
   Download,
-  FileText,
   Menu,
   PlayCircle,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+import { completeLesson } from "@/actions/courses/complete-lesson";
+import { useRef, useState, useTransition } from "react";
+import { saveVideoProgress } from "@/actions/courses/save-video-progress";
 
 type Lesson = {
   id: string;
@@ -24,6 +28,14 @@ type Lesson = {
   duration: number | null;
   isPreview: boolean;
   sortOrder: number;
+};
+
+type LessonProgress = {
+  id: string;
+  lessonId: string;
+  completed: boolean;
+  watchedSeconds: number;
+  completedAt: Date | string | null;
 };
 
 type Module = {
@@ -47,15 +59,23 @@ type Course = {
 interface Props {
   enrollmentId: string;
   progress: number;
+  lessonProgress: LessonProgress[];
   course: Course;
   selectedLessonId: string;
 }
 
 export default function CourseLearningPlayer({
+  enrollmentId,
   progress,
+  lessonProgress,
   course,
   selectedLessonId,
 }: Props) {
+  const router = useRouter();
+
+  const [isPending, startTransition] =
+    useTransition();
+
   const [mobileCurriculumOpen, setMobileCurriculumOpen] =
     useState(false);
 
@@ -81,6 +101,112 @@ export default function CourseLearningPlayer({
     currentIndex < lessons.length - 1
       ? lessons[currentIndex + 1]
       : null;
+
+  const completedLessonIds = new Set(
+    lessonProgress
+      .filter((item) => item.completed)
+      .map((item) => item.lessonId)
+  );
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const lastSavedTimeRef = useRef(0);
+
+  const currentLessonProgress =
+    lessonProgress.find(
+      (item) => item.lessonId === selectedLesson.id
+    );
+
+  const savedWatchSeconds =
+    currentLessonProgress?.watchedSeconds ?? 0;
+
+  const saveCurrentVideoProgress = async (
+    seconds: number
+  ) => {
+    if (!Number.isFinite(seconds) || seconds < 0) {
+      return;
+    }
+
+    const roundedSeconds = Math.floor(seconds);
+
+    // Avoid unnecessary duplicate writes
+    if (
+      roundedSeconds <= lastSavedTimeRef.current
+    ) {
+      return;
+    }
+
+    lastSavedTimeRef.current = roundedSeconds;
+
+    const result = await saveVideoProgress(
+      enrollmentId,
+      selectedLesson.id,
+      roundedSeconds
+    );
+
+    if (!result.success) {
+      console.error(
+        "Unable to save video progress:",
+        result.message
+      );
+    }
+  };
+
+  const isCurrentLessonCompleted =
+    completedLessonIds.has(selectedLesson.id);
+
+  const handleCompleteLesson = () => {
+    if (isCurrentLessonCompleted) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await completeLesson(
+        enrollmentId,
+        selectedLesson.id
+      );
+
+      if (!result.success) {
+        alert(
+          result.message ||
+          "Unable to complete lesson."
+        );
+
+        return;
+      }
+
+      router.refresh();
+    });
+  };
+
+  const handleCompleteAndContinue = () => {
+    startTransition(async () => {
+      // Current lesson already completed नसेल तर complete करा
+      if (!isCurrentLessonCompleted) {
+        const result = await completeLesson(
+          enrollmentId,
+          selectedLesson.id
+        );
+
+        if (!result.success) {
+          alert(
+            result.message ||
+            "Unable to complete lesson."
+          );
+          return;
+        }
+      }
+
+      // पुढच्या lesson वर जा
+      if (nextLesson) {
+        router.push(
+          `/learn/${course.slug}?lesson=${nextLesson.id}`
+        );
+      } else {
+        // Final lesson असल्यास refreshed 100% state दाखवा
+        router.refresh();
+      }
+    });
+  };
 
   const curriculum = (
     <div className="flex h-full flex-col">
@@ -142,6 +268,8 @@ export default function CourseLearningPlayer({
                     const active =
                       lesson.id ===
                       selectedLesson.id;
+                    const completed =
+                      completedLessonIds.has(lesson.id);
 
                     return (
                       <Link
@@ -152,27 +280,27 @@ export default function CourseLearningPlayer({
                             false
                           )
                         }
-                        className={`flex gap-3 border-t px-5 py-4 transition ${
-                          active
-                            ? "bg-primary/10"
-                            : "hover:bg-muted/50"
-                        }`}
+                        className={`flex gap-3 border-t px-5 py-4 transition ${active
+                          ? "bg-primary/10"
+                          : "hover:bg-muted/50"
+                          }`}
                       >
                         <div className="mt-0.5">
-                          {active ? (
+                          {completed ? (
+                            <CheckCircle2 className="h-5 w-5 text-green-600" />
+                          ) : active ? (
                             <PlayCircle className="h-5 w-5 text-primary" />
                           ) : (
-                            <CheckCircle2 className="h-5 w-5 text-muted-foreground" />
+                            <Circle className="h-5 w-5 text-muted-foreground" />
                           )}
                         </div>
 
                         <div className="min-w-0">
                           <p
-                            className={`text-sm ${
-                              active
-                                ? "font-semibold text-primary"
-                                : "font-medium"
-                            }`}
+                            className={`text-sm ${active
+                              ? "font-semibold text-primary"
+                              : "font-medium"
+                              }`}
                           >
                             {lessonIndex + 1}.{" "}
                             {lesson.title}
@@ -246,13 +374,56 @@ export default function CourseLearningPlayer({
               {selectedLesson.videoUrl ? (
                 <video
                   key={selectedLesson.id}
+                  ref={videoRef}
                   controls
                   controlsList="nodownload"
                   className="aspect-video w-full"
                   src={selectedLesson.videoUrl}
+
+                  onLoadedMetadata={(event) => {
+                    const video = event.currentTarget;
+
+                    if (
+                      savedWatchSeconds > 0 &&
+                      savedWatchSeconds < video.duration
+                    ) {
+                      video.currentTime = savedWatchSeconds;
+                      lastSavedTimeRef.current =
+                        savedWatchSeconds;
+                    }
+                  }}
+
+                  onTimeUpdate={(event) => {
+                    const video = event.currentTarget;
+                    const currentSeconds = Math.floor(
+                      video.currentTime
+                    );
+
+                    // Save approximately every 15 seconds
+                    if (
+                      currentSeconds -
+                      lastSavedTimeRef.current >=
+                      15
+                    ) {
+                      void saveCurrentVideoProgress(
+                        currentSeconds
+                      );
+                    }
+                  }}
+
+                  onPause={(event) => {
+                    void saveCurrentVideoProgress(
+                      event.currentTarget.currentTime
+                    );
+                  }}
+
+                  onEnded={(event) => {
+                    void saveCurrentVideoProgress(
+                      event.currentTarget.duration
+                    );
+                  }}
                 >
-                  Your browser does not support
-                  video playback.
+                  Your browser does not support video playback.
                 </video>
               ) : (
                 <div className="flex aspect-video flex-col items-center justify-center p-6 text-center text-white">
@@ -298,6 +469,28 @@ export default function CourseLearningPlayer({
               )}
             </div>
 
+            <div className="mt-6">
+              {isCurrentLessonCompleted ? (
+                <div className="inline-flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium text-green-600">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Lesson Completed
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleCompleteLesson}
+                  disabled={isPending}
+                  className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <CheckCircle2 className="h-4 w-4" />
+
+                  {isPending
+                    ? "Updating..."
+                    : "Mark as Complete"}
+                </button>
+              )}
+            </div>
+
             {/* Navigation */}
             <div className="flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between">
               {previousLesson ? (
@@ -311,55 +504,71 @@ export default function CourseLearningPlayer({
                 <div />
               )}
 
-              {nextLesson ? (
-                <Link
-                  href={`/learn/${course.slug}?lesson=${nextLesson.id}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-                >
-                  Next Lesson
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
-              ) : (
-                <div className="inline-flex items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Final Lesson
-                </div>
-              )}
+              <button
+                type="button"
+                onClick={handleCompleteAndContinue}
+                disabled={isPending}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isPending ? (
+                  "Updating..."
+                ) : nextLesson ? (
+                  <>
+                    {isCurrentLessonCompleted
+                      ? "Next Lesson"
+                      : "Mark Complete & Continue"}
+
+                    <ChevronRight className="h-4 w-4" />
+                  </>
+                ) : isCurrentLessonCompleted ? (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Course Completed
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="h-4 w-4" />
+                    Complete Course
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </main>
-      </div>
+      </div >
 
       {/* Mobile curriculum drawer */}
-      {mobileCurriculumOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <button
-            type="button"
-            aria-label="Close curriculum"
-            className="absolute inset-0 bg-black/50"
-            onClick={() =>
-              setMobileCurriculumOpen(false)
-            }
-          />
+      {
+        mobileCurriculumOpen && (
+          <div className="fixed inset-0 z-50 lg:hidden">
+            <button
+              type="button"
+              aria-label="Close curriculum"
+              className="absolute inset-0 bg-black/50"
+              onClick={() =>
+                setMobileCurriculumOpen(false)
+              }
+            />
 
-          <div className="absolute inset-y-0 right-0 w-[88%] max-w-sm bg-background shadow-xl">
-            <div className="absolute right-3 top-3 z-10">
-              <button
-                type="button"
-                onClick={() =>
-                  setMobileCurriculumOpen(false)
-                }
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background"
-                aria-label="Close curriculum"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            <div className="absolute inset-y-0 right-0 w-[88%] max-w-sm bg-background shadow-xl">
+              <div className="absolute right-3 top-3 z-10">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setMobileCurriculumOpen(false)
+                  }
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md border bg-background"
+                  aria-label="Close curriculum"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              {curriculum}
             </div>
-
-            {curriculum}
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 }

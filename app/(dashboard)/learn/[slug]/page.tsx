@@ -64,6 +64,7 @@ export default async function LearnCoursePage({
     <CourseLearningPlayer
       enrollmentId={enrollment.id}
       progress={enrollment.progress}
+      lessonProgress={enrollment.lessonProgress}
       course={course}
       selectedLessonId={selectedLesson.id}
     />

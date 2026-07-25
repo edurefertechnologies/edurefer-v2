@@ -21,13 +21,28 @@ export async function getLearningCourse(slug: string) {
         slug,
       },
 
-      status: "ACTIVE",
+      status: {
+        in: ["ACTIVE", "COMPLETED"],
+      },
     },
 
     select: {
       id: true,
       progress: true,
+      status: true,
       enrolledAt: true,
+      completedAt: true,
+
+      // Actual lesson progress
+      lessonProgress: {
+        select: {
+          id: true,
+          lessonId: true,
+          completed: true,
+          watchedSeconds: true,
+          completedAt: true,
+        },
+      },
 
       course: {
         select: {
@@ -86,7 +101,11 @@ export async function getLearningCourse(slug: string) {
     enrollment: {
       id: enrollment.id,
       progress: enrollment.progress,
+      status: enrollment.status,
       enrolledAt: enrollment.enrolledAt,
+      completedAt: enrollment.completedAt,
+
+      lessonProgress: enrollment.lessonProgress,
 
       course: enrollment.course,
     },

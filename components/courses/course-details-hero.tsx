@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   BookOpen,
@@ -14,14 +15,23 @@ import {
 import Container from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import type { CourseDetailsType } from "@/types/course";
+import type { EnrollmentStatus } from "@prisma/client";
 
 interface Props {
   course: CourseDetailsType;
+  enrollmentStatus: EnrollmentStatus | null;
 }
 
 export default function CourseDetailsHero({
   course,
+  enrollmentStatus,
 }: Props) {
+  const isEnrolled =
+    enrollmentStatus === "ACTIVE" ||
+    enrollmentStatus === "COMPLETED";
+
+  const isCompleted =
+    enrollmentStatus === "COMPLETED";
   return (
     <section className="section">
       <Container>
@@ -69,10 +79,27 @@ export default function CourseDetailsHero({
               </div>
 
               <div className="mt-10 flex gap-4">
-                <Button size="lg">
-                  Enroll Now
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                <Button
+                  size="lg"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href={
+                        isEnrolled
+                          ? `/learn/${course.slug}`
+                          : `/checkout/${course.slug}`
+                      }
+                    >
+                      {isCompleted
+                        ? "Review Course"
+                        : isEnrolled
+                          ? "Continue Learning"
+                          : "Enroll Now"}
+
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  }
+                />
 
                 <Button
                   variant="outline"
@@ -172,9 +199,27 @@ export default function CourseDetailsHero({
               </div>
 
               <Button className="mt-6 w-full">
-                <BookOpen className="mr-2 h-5 w-5" />
-                Start Learning
-              </Button>
+                <Button
+                  className="mt-6 w-full"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href={
+                        isEnrolled
+                          ? `/learn/${course.slug}`
+                          : `/checkout/${course.slug}`
+                      }
+                    >
+                      <BookOpen className="mr-2 h-5 w-5" />
+
+                      {isCompleted
+                        ? "Review Course"
+                        : isEnrolled
+                          ? "Start Learning"
+                          : "Enroll Now"}
+                    </Link>
+                  }
+                />
             </div>
           </motion.div>
         </div>

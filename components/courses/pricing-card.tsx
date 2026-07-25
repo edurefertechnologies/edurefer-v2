@@ -1,10 +1,17 @@
 "use client";
 
-import { CheckCircle2, CreditCard, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Container from "@/components/layout/container";
 import type { CourseDetailsType } from "@/types/course";
+import type { EnrollmentStatus } from "@prisma/client";
+
 import Link from "next/link";
+import {
+  BookOpen,
+  CheckCircle2,
+  CreditCard,
+  ShieldCheck,
+} from "lucide-react";
 
 const features = [
   "Lifetime Access",
@@ -17,11 +24,19 @@ const features = [
 
 interface Props {
   course: CourseDetailsType;
+  enrollmentStatus: EnrollmentStatus | null;
 }
 
 export default function PricingCard({
   course,
+  enrollmentStatus,
 }: Props) {
+  const isEnrolled =
+    enrollmentStatus === "ACTIVE" ||
+    enrollmentStatus === "COMPLETED";
+
+  const isCompleted =
+    enrollmentStatus === "COMPLETED";
   return (
     <section className="section">
       <Container>
@@ -68,7 +83,7 @@ export default function PricingCard({
                   </p>
 
                   <h3 className="mt-2 text-5xl font-bold text-primary">
-                    ₹₹{Number(course.product.price).toLocaleString()}
+                    ₹{Number(course.product.price).toLocaleString()}
                   </h3>
 
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -80,10 +95,31 @@ export default function PricingCard({
                   <Button
                     size="lg"
                     className="mt-8 w-full"
-                  >
-                    <CreditCard className="mr-2 h-5 w-5" />
-                    Enroll Now
-                  </Button>
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href={
+                          isEnrolled
+                            ? `/learn/${course.slug}`
+                            : `/checkout/${course.slug}`
+                        }
+                      >
+                        {isCompleted ? (
+                          <CheckCircle2 className="mr-2 h-5 w-5" />
+                        ) : isEnrolled ? (
+                          <BookOpen className="mr-2 h-5 w-5" />
+                        ) : (
+                          <CreditCard className="mr-2 h-5 w-5" />
+                        )}
+
+                        {isCompleted
+                          ? "Review Course"
+                          : isEnrolled
+                            ? "Continue Learning"
+                            : "Enroll Now"}
+                      </Link>
+                    }
+                  />
                 </Link>
 
                 <Button

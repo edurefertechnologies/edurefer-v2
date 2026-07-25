@@ -2,6 +2,7 @@ import {
   BookOpen,
   Brain,
   CreditCard,
+  GraduationCap,
   Home,
   Package,
   Settings,
@@ -19,6 +20,11 @@ export const navItems = [
     title: "Courses",
     href: "/courses",
     icon: BookOpen,
+  },
+  {
+    title: "My Courses",
+    href: "/my-courses",
+    icon: GraduationCap,
   },
   {
     title: "AI Assistant",

@@ -1,9 +1,8 @@
 "use server";
 
+import crypto from "crypto";
 import { revalidatePath } from "next/cache";
-import {
-  EnrollmentStatus,
-} from "@prisma/client";
+import { EnrollmentStatus } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
@@ -22,8 +21,6 @@ export async function completeLesson(
       };
     }
 
-    // Verify that this enrollment belongs to
-    // the logged-in user.
     const enrollment =
       await prisma.enrollment.findFirst({
         where: {
@@ -69,8 +66,6 @@ export async function completeLesson(
           )
       );
 
-    // Prevent completing a lesson from
-    // another course.
     if (!allLessonIds.includes(lessonId)) {
       return {
         success: false,
@@ -80,7 +75,7 @@ export async function completeLesson(
     }
 
     await prisma.$transaction(async (tx) => {
-      // Upsert makes this operation idempotent.
+      // 1. Mark lesson complete
       await tx.lessonProgress.upsert({
         where: {
           enrollmentId_lessonId: {
@@ -102,31 +97,38 @@ export async function completeLesson(
         },
       });
 
+      // 2. Count completed lessons
       const completedLessons =
         await tx.lessonProgress.count({
           where: {
             enrollmentId,
             completed: true,
+
             lessonId: {
               in: allLessonIds,
             },
           },
         });
 
-      const totalLessons = allLessonIds.length;
+      const totalLessons =
+        allLessonIds.length;
 
+      // 3. Calculate progress
       const progress =
         totalLessons > 0
           ? Math.min(
-              100,
-              (completedLessons /
-                totalLessons) *
-                100
-            )
+            100,
+            (completedLessons /
+              totalLessons) *
+            100
+          )
           : 0;
 
-      const isCompleted = progress >= 100;
+      const isCompleted =
+        totalLessons > 0 &&
+        progress >= 100;
 
+      // 4. Update enrollment
       await tx.enrollment.update({
         where: {
           id: enrollmentId,
@@ -144,11 +146,41 @@ export async function completeLesson(
             : null,
         },
       });
+
+      // 5. Generate certificate record
+      // only after 100% course completion
+      if (isCompleted) {
+        const existingCertificate =
+          await tx.certificate.findUnique({
+            where: {
+              enrollmentId,
+            },
+          });
+
+        if (!existingCertificate) {
+          const certificateNo =
+            `EDU-${new Date().getFullYear()}-${crypto
+              .randomUUID()
+              .replace(/-/g, "")
+              .slice(0, 10)
+              .toUpperCase()}`;
+
+          await tx.certificate.create({
+            data: {
+              enrollmentId,
+              certificateNo,
+            },
+          });
+        }
+      }
     });
 
     revalidatePath(
       `/learn/${enrollment.course.slug}`
     );
+
+    revalidatePath("/my-courses");
+    revalidatePath("/dashboard");
 
     return {
       success: true,
