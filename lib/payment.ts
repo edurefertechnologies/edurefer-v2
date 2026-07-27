@@ -132,6 +132,7 @@ export async function completePayment({
             walletId: wallet.id,
             amount: REFERRAL.REWARD,
             type: "CREDIT",
+            source: "REFERRAL",
             description: `Referral bonus for order ${payment.order.orderNumber}`,
           },
         });

@@ -201,13 +201,17 @@ model Wallet {
 }
 
 model WalletTransaction {
-  id          String          @id @default(cuid())
+  id          String                  @id @default(cuid())
   walletId    String
-  amount      Decimal         @db.Decimal(10, 2)
+  amount      Decimal                 @db.Decimal(10, 2)
   description String?
-  createdAt   DateTime        @default(now())
   type        TransactionType
-  wallet      Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  source      WalletTransactionSource @default(ADMIN)
+  createdAt   DateTime                @default(now())
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
 }
 
 model Referral {
@@ -225,16 +229,32 @@ model Referral {
 }
 
 model Withdrawal {
-  id          String           @id @default(cuid())
-  walletId    String
-  amount      Decimal          @db.Decimal(10, 2)
-  status      WithdrawalStatus @default(PENDING)
-  remarks     String?
-  processedAt DateTime?
-  createdAt   DateTime         @default(now())
-  wallet      Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  id       String           @id @default(cuid())
+  walletId String
+  amount   Decimal          @db.Decimal(10, 2)
+  status   WithdrawalStatus @default(PENDING)
+
+  // Payout details
+  payoutMode String?
+  upiId      String?
+
+  accountName   String?
+  accountNumber String?
+  ifscCode      String?
+  bankName      String?
+
+  // Admin processing
+  remarks       String?
+  transactionId String?
+  processedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
+  @@index([status])
 }
 
 model Course {
