@@ -83,7 +83,7 @@ export default function PricingCard({
                   </p>
 
                   <h3 className="mt-2 text-5xl font-bold text-primary">
-                    ₹{Number(course.product.price).toLocaleString()}
+                    ₹{Number(course.product.price).toLocaleString("en-IN")}
                   </h3>
 
                   <p className="mt-2 text-sm text-muted-foreground">
@@ -91,36 +91,34 @@ export default function PricingCard({
                   </p>
                 </div>
 
-                <Link href={`/checkout/${course.slug}`}>
-                  <Button
-                    size="lg"
-                    className="mt-8 w-full"
-                    nativeButton={false}
-                    render={
-                      <Link
-                        href={
-                          isEnrolled
-                            ? `/learn/${course.slug}`
-                            : `/checkout/${course.slug}`
-                        }
-                      >
-                        {isCompleted ? (
-                          <CheckCircle2 className="mr-2 h-5 w-5" />
-                        ) : isEnrolled ? (
-                          <BookOpen className="mr-2 h-5 w-5" />
-                        ) : (
-                          <CreditCard className="mr-2 h-5 w-5" />
-                        )}
+                <Button
+                  size="lg"
+                  className="mt-8 w-full"
+                  nativeButton={false}
+                  render={
+                    <Link
+                      href={
+                        isEnrolled
+                          ? `/learn/${course.slug}`
+                          : `/checkout/${course.slug}`
+                      }
+                    />
+                  }
+                >
+                  {isCompleted ? (
+                    <CheckCircle2 className="mr-2 h-5 w-5" />
+                  ) : isEnrolled ? (
+                    <BookOpen className="mr-2 h-5 w-5" />
+                  ) : (
+                    <CreditCard className="mr-2 h-5 w-5" />
+                  )}
 
-                        {isCompleted
-                          ? "Review Course"
-                          : isEnrolled
-                            ? "Continue Learning"
-                            : "Enroll Now"}
-                      </Link>
-                    }
-                  />
-                </Link>
+                  {isCompleted
+                    ? "Review Course"
+                    : isEnrolled
+                      ? "Continue Learning"
+                      : "Enroll Now"}
+                </Button>
 
                 <Button
                   variant="outline"

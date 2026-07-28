@@ -147,12 +147,10 @@ export default function CourseDetailsHero({
                 variant="outline"
                 size="lg"
                 nativeButton={false}
-                render={
-                  <a href="#curriculum">
-                    View Curriculum
-                  </a>
-                }
-              />
+                render={<a href="#curriculum" />}
+              >
+                View Curriculum
+              </Button>
               <SaveCourseButton
                 courseId={course.id}
                 initialSaved={isWishlisted}

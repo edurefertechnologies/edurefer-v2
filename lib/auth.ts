@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -11,6 +12,21 @@ export const auth = betterAuth({
 
     emailAndPassword: {
         enabled: true,
+
+        resetPasswordTokenExpiresIn: 3600,
+
+        revokeSessionsOnPasswordReset: true,
+
+        sendResetPassword: async ({
+            user,
+            url,
+        }) => {
+            await sendPasswordResetEmail({
+                email: user.email,
+                name: user.name ?? "Student",
+                resetUrl: url,
+            });
+        },
     },
 
     user: {
@@ -32,7 +48,10 @@ export const auth = betterAuth({
     },
 
     plugins: [
-        admin()
+        admin({
+            defaultRole: "STUDENT",
+            adminRoles: ["ADMIN"],
+        }),
     ],
 
     trustedOrigins: [process.env.BETTER_AUTH_URL!],

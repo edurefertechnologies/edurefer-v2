@@ -97,7 +97,18 @@ export default function LoginForm() {
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">
+                Password
+              </Label>
+
+              <Link
+                href="/forgot-password"
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
 
             <PasswordInput
               id="password"
@@ -106,7 +117,7 @@ export default function LoginForm() {
             />
 
             {form.formState.errors.password && (
-              <p className="text-sm text-red-500 mt-1">
+              <p className="mt-1 text-sm text-red-500">
                 {form.formState.errors.password.message}
               </p>
             )}

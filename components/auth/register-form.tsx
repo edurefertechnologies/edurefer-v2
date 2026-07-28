@@ -147,7 +147,6 @@ export default function RegisterForm() {
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <PasswordInput
               id="confirmPassword"
-              type="password"
               {...register("confirmPassword")}
             />
 

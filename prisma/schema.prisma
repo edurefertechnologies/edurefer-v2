@@ -44,6 +44,10 @@ model User {
   courseReviews   CourseReview[]
   wishlists       CourseWishlist[]
 
+  banned     Boolean   @default(false)
+  banReason  String?
+  banExpires DateTime?
+
   @@index([email])
   @@index([referralCode])
   @@map("user")
