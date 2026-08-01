@@ -26,9 +26,14 @@ model User {
   name            String?
   emailVerified   Boolean          @default(false)
   image           String?
+  banExpires      DateTime?
+  banReason       String?
+  banned          Boolean          @default(false)
   aiConversations AIConversation[]
   aiWallet        AIWallet?
   auditLogs       AuditLog[]
+  courseReviews   CourseReview[]
+  wishlists       CourseWishlist[]
   enrollments     Enrollment[]
   notifications   Notification[]
   orders          Order[]
@@ -41,12 +46,6 @@ model User {
   sessions        Session[]
   referredBy      User?            @relation("UserReferrals", fields: [referredById], references: [id])
   referrals       User[]           @relation("UserReferrals")
-  courseReviews   CourseReview[]
-  wishlists       CourseWishlist[]
-
-  banned     Boolean   @default(false)
-  banReason  String?
-  banExpires DateTime?
 
   @@index([email])
   @@index([referralCode])
@@ -209,11 +208,10 @@ model WalletTransaction {
   walletId    String
   amount      Decimal                 @db.Decimal(10, 2)
   description String?
+  createdAt   DateTime                @default(now())
   type        TransactionType
   source      WalletTransactionSource @default(ADMIN)
-  createdAt   DateTime                @default(now())
-
-  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  wallet      Wallet                  @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
 }
@@ -233,29 +231,22 @@ model Referral {
 }
 
 model Withdrawal {
-  id       String           @id @default(cuid())
-  walletId String
-  amount   Decimal          @db.Decimal(10, 2)
-  status   WithdrawalStatus @default(PENDING)
-
-  // Payout details
-  payoutMode String?
-  upiId      String?
-
+  id            String           @id @default(cuid())
+  walletId      String
+  amount        Decimal          @db.Decimal(10, 2)
+  status        WithdrawalStatus @default(PENDING)
+  remarks       String?
+  processedAt   DateTime?
+  createdAt     DateTime         @default(now())
   accountName   String?
   accountNumber String?
-  ifscCode      String?
   bankName      String?
-
-  // Admin processing
-  remarks       String?
+  ifscCode      String?
+  payoutMode    String?
   transactionId String?
-  processedAt   DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  updatedAt     DateTime         @updatedAt
+  upiId         String?
+  wallet        Wallet           @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
   @@index([status])
@@ -275,9 +266,9 @@ model Course {
   updatedAt   DateTime         @updatedAt
   product     Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
   modules     CourseModule[]
-  enrollments Enrollment[]
   reviews     CourseReview[]
   wishlists   CourseWishlist[]
+  enrollments Enrollment[]
 
   @@index([slug])
 }
@@ -347,9 +338,8 @@ model CourseReview {
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@index([courseId])
@@ -361,9 +351,8 @@ model CourseWishlist {
   userId    String
   courseId  String
   createdAt DateTime @default(now())
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
   @@index([userId])
