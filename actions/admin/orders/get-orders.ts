@@ -49,7 +49,7 @@ export async function getOrders() {
             },
           },
 
-          bundle: {
+          package: {
             select: {
               id: true,
               name: true,

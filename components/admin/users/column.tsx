@@ -59,7 +59,12 @@ export const columns: ColumnDef<UserColumn>[] = [
     accessorKey: "wallet",
     header: "Wallet",
     cell: ({ row }) => (
-      <>₹{String(row.original.wallet?.balance ?? 0)}</>
+      <>
+        ₹
+        {Number(
+          row.original.wallet?.balance ?? 0
+        ).toLocaleString("en-IN")}
+      </>
     ),
   },
 
@@ -67,7 +72,10 @@ export const columns: ColumnDef<UserColumn>[] = [
     accessorKey: "aiWallet",
     header: "AI Credits",
     cell: ({ row }) => (
-      <>{row.original.aiWallet?.balance ?? 0}</>
+      <>{Number(
+        row.original.aiWallet?.balance ?? 0
+      )}
+      </>
     ),
   },
 

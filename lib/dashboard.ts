@@ -1,13 +1,105 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getDashboardStats(userId: string) {
-  // Temporary implementation
-  // Next modules will replace these with real Prisma queries.
+  const [
+    wallet,
+    aiWallet,
+    totalCourses,
+    activeCourses,
+    completedCourses,
+    totalOrders,
+    successfulReferrals,
+    pendingReferrals,
+    certificates,
+  ] = await Promise.all([
+    prisma.wallet.findUnique({
+      where: {
+        userId,
+      },
 
+      select: {
+        balance: true,
+      },
+    }),
+
+    prisma.aIWallet.findUnique({
+      where: {
+        userId,
+      },
+
+      select: {
+        balance: true,
+      },
+    }),
+
+    prisma.enrollment.count({
+      where: {
+        userId,
+      },
+    }),
+
+    prisma.enrollment.count({
+      where: {
+        userId,
+        status: "ACTIVE",
+      },
+    }),
+
+    prisma.enrollment.count({
+      where: {
+        userId,
+        status: "COMPLETED",
+      },
+    }),
+
+    prisma.order.count({
+      where: {
+        userId,
+        status: "PAID",
+      },
+    }),
+
+    prisma.referral.count({
+      where: {
+        referrerId: userId,
+        isRewarded: true,
+      },
+    }),
+
+    prisma.referral.count({
+      where: {
+        referrerId: userId,
+        isRewarded: false,
+      },
+    }),
+
+    prisma.certificate.count({
+      where: {
+        enrollment: {
+          userId,
+        },
+      },
+    }),
+  ]);
   return {
-    walletBalance: 0,
-    aiCredits: 300,
-    courses: 0,
-    referrals: 0,
+    walletBalance: wallet
+      ? Number(wallet.balance)
+      : 0,
+
+    aiCredits: aiWallet?.balance ?? 0,
+
+    totalCourses,
+
+    activeCourses,
+
+    completedCourses,
+
+    totalOrders,
+
+    successfulReferrals,
+
+    pendingReferrals,
+
+    totalCertificates: certificates,
   };
 }

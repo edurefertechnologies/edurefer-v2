@@ -1,0 +1,186 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 0000022D AA0E:1D76
+D:\PROJECTS\EDUREFER-V2\COMPONENTS
+¦   payment-button.tsx
+¦   
++---about
+¦       founder-card.tsx
+¦       founders.tsx
+¦       
++---admin
+¦   ¦   app-sidebar.tsx
+¦   ¦   
+¦   +---analytics
+¦   ¦       revenue-chart.tsx
+¦   ¦       
+¦   +---courses
+¦   ¦       add-lesson-dialog.tsx
+¦   ¦       add-module-dialog.tsx
+¦   ¦       course-actions.tsx
+¦   ¦       course-form.tsx
+¦   ¦       create-course-page-form.tsx
+¦   ¦       edit-course-form.tsx
+¦   ¦       lesson-actions.tsx
+¦   ¦       module-actions.tsx
+¦   ¦       
+¦   +---dashboard
+¦   ¦       stats-card.tsx
+¦   ¦       stats-grid.tsx
+¦   ¦       
+¦   +---products
+¦   ¦       columns.tsx
+¦   ¦       create-product-page-form.tsx
+¦   ¦       edit-product-page-form.tsx
+¦   ¦       product-actions.tsx
+¦   ¦       product-form.tsx
+¦   ¦       product-status-badge.tsx
+¦   ¦       product-type-badge.tsx
+¦   ¦       products-table.tsx
+¦   ¦       products-toolbars.tsx
+¦   ¦       
+¦   +---settings
+¦   ¦       settings-form.tsx
+¦   ¦       
+¦   +---users
+¦   ¦       column.tsx
+¦   ¦       create-user-dialog.tsx
+¦   ¦       role-badge.tsx
+¦   ¦       status-badge.tsx
+¦   ¦       user-actions.tsx
+¦   ¦       users-table.tsx
+¦   ¦       
+¦   +---withdrawals
+¦           withdrawal-actions.tsx
+¦           
++---auth
+¦       forgot-password-form.tsx
+¦       login-form.tsx
+¦       logout-button.tsx
+¦       register-form.tsx
+¦       reset-password-form.tsx
+¦       
++---common
+¦       logo.tsx
+¦       
++---courses
+¦       course-card.tsx
+¦       course-details-hero.tsx
+¦       course-faq.tsx
+¦       course-grid.tsx
+¦       course-hero.tsx
+¦       course-overview.tsx
+¦       course-reviews.tsx
+¦       curriculum.tsx
+¦       instructor.tsx
+¦       learning-outcomes.tsx
+¦       pricing-card.tsx
+¦       related-courses.tsx
+¦       save-course-button.tsx
+¦       
++---dashboard
+¦       app-header.tsx
+¦       app-sidebar.tsx
+¦       continue-learning.tsx
+¦       dashboard-cards.tsx
+¦       nav-items.ts
+¦       quick-actions.tsx
+¦       recent-activity.tsx
+¦       recent-notifications.tsx
+¦       recent-orders.tsx
+¦       wallet-summary.tsx
+¦       
++---data-table
+¦       data-table.tsx
+¦       
++---home
+¦       ai-tools.tsx
+¦       courses.tsx
+¦       cta.tsx
+¦       faq.tsx
+¦       features.tsx
+¦       hero.tsx
+¦       learning-process.tsx
+¦       newsletter.tsx
+¦       placement-partners.tsx
+¦       pricing.tsx
+¦       stats.tsx
+¦       testimonials.tsx
+¦       trusted.tsx
+¦       
++---layout
+¦       container.tsx
+¦       footer.tsx
+¦       mobile-menu.tsx
+¦       navbar.tsx
+¦       page-wrapper.tsx
+¦       
++---learning
+¦       course-learning-player.tsx
+¦       
++---marketing
+¦   +---courses
+¦   ¦       course-card.tsx
+¦   ¦       courses.tsx
+¦   ¦       
+¦   +---data
+¦   ¦       courses.ts
+¦   ¦       features.ts
+¦   ¦       founders.ts
+¦   ¦       hero.ts
+¦   ¦       
+¦   +---features
+¦   ¦       feature-card.tsx
+¦   ¦       features.tsx
+¦   ¦       
+¦   +---hero
+¦   ¦       hero-badge.tsx
+¦   ¦       hero-content.tsx
+¦   ¦       hero-image.tsx
+¦   ¦       hero.tsx
+¦   ¦       
+¦   +---shared
+¦   +---stats
+¦           stats.tsx
+¦           
++---notifications
+¦       mark-all-read-button.tsx
+¦       notification-item.tsx
+¦       
++---providers
+¦       theme-provider.tsx
+¦       
++---shared
+¦       image-upload.tsx
+¦       section-header.tsx
+¦       section.tsx
+¦       
++---theme
+¦       theme-toggle.tsx
+¦       
++---ui
+¦       accordion.tsx
+¦       alert-dialog.tsx
+¦       avatar.tsx
+¦       badge.tsx
+¦       breadcrumb.tsx
+¦       button.tsx
+¦       card.tsx
+¦       checkbox.tsx
+¦       dialog.tsx
+¦       dropdown-menu.tsx
+¦       input.tsx
+¦       label.tsx
+¦       password-input.tsx
+¦       select.tsx
+¦       separator.tsx
+¦       sheet.tsx
+¦       sidebar.tsx
+¦       skeleton.tsx
+¦       sonner.tsx
+¦       table.tsx
+¦       textarea.tsx
+¦       tooltip.tsx
+¦       
++---wallet
+        withdrawal-form.tsx
+        

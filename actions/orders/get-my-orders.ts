@@ -62,7 +62,7 @@ export async function getMyOrders() {
             },
           },
 
-          bundle: {
+          package: {
             select: {
               id: true,
               name: true,

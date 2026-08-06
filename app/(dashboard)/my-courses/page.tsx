@@ -8,9 +8,23 @@ import {
 } from "lucide-react";
 
 import { getMyCourses } from "@/actions/courses/get-my-courses";
+import { LearningStats } from "@/components/my-learning/learning-stats";
 
 export default async function MyCoursesPage() {
   const enrollments = await getMyCourses();
+  const totalCourses = enrollments.length;
+
+  const activeCourses = enrollments.filter(
+    (course) => course.status === "ACTIVE"
+  ).length;
+
+  const completedCourses = enrollments.filter(
+    (course) => course.status === "COMPLETED"
+  ).length;
+
+  const certificates = enrollments.filter(
+    (course) => course.certificate
+  ).length;
 
   return (
     <div className="space-y-8">
@@ -23,6 +37,13 @@ export default async function MyCoursesPage() {
           Access your enrolled courses and track your learning progress.
         </p>
       </div>
+
+      <LearningStats
+        totalCourses={totalCourses}
+        activeCourses={activeCourses}
+        completedCourses={completedCourses}
+        certificates={certificates}
+      />
 
       {enrollments.length === 0 ? (
         <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border bg-card p-6 text-center">

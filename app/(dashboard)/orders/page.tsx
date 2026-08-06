@@ -1,16 +1,20 @@
 import Link from "next/link";
 import {
-  CheckCircle2,
-  Clock3,
   Package,
   ReceiptText,
-  XCircle,
 } from "lucide-react";
 
 import { getMyOrders } from "@/actions/orders/get-my-orders";
+import { OrderStatusBadge } from "@/components/dashboard/order-status-badge";
 
 export default async function OrdersPage() {
   const orders = await getMyOrders();
+
+  type Order = Awaited<
+    ReturnType<typeof getMyOrders>
+  >[number];
+
+  type OrderItem = Order["items"][number];
 
   return (
     <div className="space-y-8">
@@ -31,11 +35,11 @@ export default async function OrdersPage() {
           </div>
 
           <h2 className="mt-4 text-lg font-semibold">
-            No orders yet
+            No purchases yet
           </h2>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Your course and package purchases will appear here.
+            Start learning today by exploring our courses and career packages.
           </p>
 
           <Link
@@ -47,14 +51,7 @@ export default async function OrdersPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order: any) => {
-            const paid =
-              order.status === "PAID" &&
-              order.payment?.status === "SUCCESS";
-
-            const failed =
-              order.payment?.status === "FAILED";
-
+          {orders.map((order: Order) => {
             return (
               <article
                 key={order.id}
@@ -67,24 +64,11 @@ export default async function OrdersPage() {
                         {order.orderNumber}
                       </h2>
 
-                      {paid ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-600">
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                          Paid
-                        </span>
-                      ) : failed ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
-                          <XCircle className="h-3.5 w-3.5" />
-                          Failed
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
-                          <Clock3 className="h-3.5 w-3.5" />
-                          Pending
-                        </span>
-                      )}
+                      <OrderStatusBadge
+                        status={order.status}
+                        paymentStatus={order.payment?.status}
+                      />
                     </div>
-
                     <p className="mt-2 text-sm text-muted-foreground">
                       {new Date(
                         order.payment?.paidAt ??
@@ -109,7 +93,7 @@ export default async function OrdersPage() {
                 </div>
 
                 <div className="mt-5 space-y-3 border-t pt-5">
-                  {order.items.map((item: any) => (
+                  {order.items.map((item: OrderItem) => (
                     <div
                       key={item.id}
                       className="flex items-center justify-between gap-4"
@@ -118,7 +102,7 @@ export default async function OrdersPage() {
                         <p className="truncate font-medium">
                           {item.product?.course?.title ??
                             item.product?.name ??
-                            item.bundle?.name ??
+                            item.package?.name ??
                             "Order Item"}
                         </p>
 
@@ -140,8 +124,17 @@ export default async function OrdersPage() {
                 {order.payment?.razorpayPaymentId && (
                   <div className="mt-5 border-t pt-4">
                     <p className="break-all text-xs text-muted-foreground">
+                      Order Number:{" "}
+                      {order.orderNumber}
+                      <br />
+
                       Payment ID:{" "}
                       {order.payment.razorpayPaymentId}
+
+                      Purchase Date:{" "}
+                      {new Date(
+                        order.payment.paidAt ?? order.createdAt
+                      ).toLocaleDateString("en-IN")}
                     </p>
                   </div>
                 )}
@@ -154,15 +147,16 @@ export default async function OrdersPage() {
                     View Details
                   </Link>
 
-                  {paid && (
-                    <a
-                      href={`/api/orders/${order.id}/invoice`}
-                      className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-                    >
-                      <ReceiptText className="h-4 w-4" />
-                      Download Invoice
-                    </a>
-                  )}
+                  {order.status === "PAID" &&
+                    order.payment?.status === "SUCCESS" && (
+                      <a
+                        href={`/api/orders/${order.id}/invoice`}
+                        className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                      >
+                        <ReceiptText className="h-4 w-4" />
+                        Download Invoice
+                      </a>
+                    )}
                 </div>
               </article>
             );

@@ -34,7 +34,7 @@ export const navItems = [
     icon: Bell,
   },
   {
-    title: "My Courses",
+    title: "My Learning",
     href: "/my-courses",
     icon: GraduationCap,
   },

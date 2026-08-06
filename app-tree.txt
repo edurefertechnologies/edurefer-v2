@@ -1,0 +1,180 @@
+Folder PATH listing for volume New Volume
+Volume serial number is 00000154 AA0E:1D76
+D:\PROJECTS\EDUREFER-V2\APP
+¦   Edurefer Logo.ico
+¦   globals.css
+¦   layout.tsx
+¦   page.tsx
+¦   
++---(admin)
+¦   ¦   layout.tsx
+¦   ¦   
+¦   +---admin
+¦       ¦   page.tsx
+¦       ¦   
+¦       +---analytics
+¦       ¦       page.tsx
+¦       ¦       
+¦       +---courses
+¦       ¦   ¦   page.tsx
+¦       ¦   ¦   
+¦       ¦   +---new
+¦       ¦   ¦       page.tsx
+¦       ¦   ¦       
+¦       ¦   +---[courseId]
+¦       ¦       +---curriculum
+¦       ¦       ¦       page.tsx
+¦       ¦       ¦       
+¦       ¦       +---edit
+¦       ¦               page.tsx
+¦       ¦               
+¦       +---enrollments
+¦       ¦   ¦   page.tsx
+¦       ¦   ¦   
+¦       ¦   +---[enrollmentId]
+¦       ¦           page.tsx
+¦       ¦           
+¦       +---orders
+¦       ¦   ¦   page.tsx
+¦       ¦   ¦   
+¦       ¦   +---[orderId]
+¦       ¦           page.tsx
+¦       ¦           
+¦       +---products
+¦       ¦   ¦   page.tsx
+¦       ¦   ¦   
+¦       ¦   +---new
+¦       ¦   ¦       page.tsx
+¦       ¦   ¦       
+¦       ¦   +---[productId]
+¦       ¦       +---edit
+¦       ¦               page.tsx
+¦       ¦               
+¦       +---referrals
+¦       ¦       page.tsx
+¦       ¦       
+¦       +---settings
+¦       ¦       page.tsx
+¦       ¦       
+¦       +---users
+¦       ¦       page.tsx
+¦       ¦       
+¦       +---wallets
+¦       ¦       page.tsx
+¦       ¦       
+¦       +---withdrawals
+¦               page.tsx
+¦               
++---(auth)
+¦   ¦   layout.tsx
+¦   ¦   
+¦   +---forgot-password
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---login
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---register
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---reset-password
+¦           page.tsx
+¦           
++---(dashboard)
+¦   ¦   layout.tsx
+¦   ¦   
+¦   +---certificates
+¦   +---checkout
+¦   ¦   +---[slug]
+¦   ¦           page.tsx
+¦   ¦           
+¦   +---courses
+¦   ¦   ¦   page.tsx
+¦   ¦   ¦   
+¦   ¦   +---[slug]
+¦   ¦           page.tsx
+¦   ¦           
+¦   +---dashboard
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---learn
+¦   ¦   +---[slug]
+¦   ¦           page.tsx
+¦   ¦           
+¦   +---my-courses
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---notifications
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---orders
+¦   ¦   ¦   page.tsx
+¦   ¦   ¦   
+¦   ¦   +---[orderId]
+¦   ¦           page.tsx
+¦   ¦           
+¦   +---profile
+¦   +---referals
+¦   +---saved-courses
+¦   ¦       page.tsx
+¦   ¦       
+¦   +---settings
+¦   +---wallet
+¦           page.tsx
+¦           
++---(marketing)
+¦   ¦   layout.tsx
+¦   ¦   page.tsx
+¦   ¦   
+¦   +---verify-certificate
+¦       ¦   page.tsx
+¦       ¦   
+¦       +---[certificateNo]
+¦               page.tsx
+¦               
++---about
++---api
+¦   +---auth
+¦   ¦   +---[...all]
+¦   ¦           route.ts
+¦   ¦           
+¦   +---certificates
+¦   ¦   +---[certificateNo]
+¦   ¦       +---download
+¦   ¦               route.ts
+¦   ¦               
+¦   +---cloudinary
+¦   ¦   +---sign
+¦   ¦           route.ts
+¦   ¦           
+¦   +---orders
+¦   ¦   +---create
+¦   ¦   ¦       route.ts
+¦   ¦   ¦       
+¦   ¦   +---[orderId]
+¦   ¦       +---invoice
+¦   ¦               route.ts
+¦   ¦               
+¦   +---razorpay
+¦   ¦   +---create-order
+¦   ¦   ¦       route.ts
+¦   ¦   ¦       
+¦   ¦   +---verify
+¦   ¦   ¦       route.ts
+¦   ¦   ¦       
+¦   ¦   +---webhook
+¦   ¦           route.ts
+¦   ¦           
+¦   +---wallet
+¦       ¦   route.ts
+¦       ¦   
+¦       +---transactions
+¦               route.ts
+¦               
++---payment
+    +---failed
+    ¦       page.tsx
+    ¦       
+    +---success
+            page.tsx
+            

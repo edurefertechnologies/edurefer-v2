@@ -11,8 +11,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Seeding database...");
 
-  const product = await prisma.product.create({
-    data: {
+  const product = await prisma.product.upsert({
+    where: {
+      slug: "full-stack-web-development",
+    },
+
+    update: {},
+
+    create: {
       name: "Full Stack Web Development",
       slug: "full-stack-web-development",
       description:
@@ -22,15 +28,21 @@ async function main() {
       sku: "FSWD-001",
       type: ProductType.COURSE,
       status: ProductStatus.PUBLISHED,
-      price: "49999.00",
+      price: "13999.00",
       currency: "INR",
       isFeatured: true,
       publishedAt: new Date(),
     },
   });
 
-  const course = await prisma.course.create({
-    data: {
+  const course = await prisma.course.upsert({
+    where: {
+      slug: "full-stack-web-development",
+    },
+
+    update: {},
+
+    create: {
       productId: product.id,
       title: "Full Stack Web Development",
       slug: "full-stack-web-development",
@@ -42,11 +54,27 @@ async function main() {
     },
   });
 
-  const htmlModule = await prisma.courseModule.create({
-    data: {
-      courseId: course.id,
-      title: "HTML & CSS",
-      sortOrder: 1,
+  const htmlModule =
+    await prisma.courseModule.upsert({
+      where: {
+        courseId_sortOrder: {
+          courseId: course.id,
+          sortOrder: 1,
+        },
+      },
+
+      update: {},
+
+      create: {
+        courseId: course.id,
+        title: "HTML & CSS",
+        sortOrder: 1,
+      },
+    });
+
+  await prisma.lesson.deleteMany({
+    where: {
+      moduleId: htmlModule.id,
     },
   });
 

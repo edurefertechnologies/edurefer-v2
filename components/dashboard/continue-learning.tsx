@@ -9,7 +9,11 @@ import { getMyCourses } from "@/actions/courses/get-my-courses";
 
 export async function ContinueLearning() {
   const enrollments = await getMyCourses();
-
+  const continueLearning = enrollments
+    .filter(
+      (course) => course.status === "ACTIVE"
+    )
+    .slice(0, 2);
   if (enrollments.length === 0) {
     return (
       <div className="rounded-xl border bg-card p-6">
@@ -18,7 +22,7 @@ export async function ContinueLearning() {
         </h2>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          You haven't enrolled in any course yet.
+          Start your learning journey by enrolling in your first course.
         </p>
 
         <Link
@@ -44,7 +48,7 @@ export async function ContinueLearning() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        {enrollments.map((enrollment) => {
+        {continueLearning.map((enrollment) => {
           const totalLessons =
             enrollment.course.modules.reduce(
               (total, module) =>
@@ -155,6 +159,17 @@ export async function ContinueLearning() {
                   )}
                 </Link>
               </div>
+
+              {enrollments.length > 2 && (
+                <div className="text-center">
+                  <Link
+                    href="/my-courses"
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    View all courses →
+                  </Link>
+                </div>
+              )}
             </div>
           );
         })}

@@ -159,9 +159,9 @@ export function AppHeader({
             {/* Header */}
             <div className="flex items-center justify-between gap-3 px-4 py-3">
               <div>
-                <DropdownMenuLabel className="p-0 text-base">
+                <h3 className="text-base font-semibold">
                   Notifications
-                </DropdownMenuLabel>
+                </h3>
 
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {unreadCount > 0
@@ -217,16 +217,16 @@ export function AppHeader({
                     >
                       <div
                         className={`flex w-full gap-3 px-4 py-3 ${!notification.isRead
-                            ? "bg-primary/5"
-                            : ""
+                          ? "bg-primary/5"
+                          : ""
                           }`}
                       >
                         {/* Unread dot */}
                         <div className="pt-2">
                           <span
                             className={`block size-2 rounded-full ${notification.isRead
-                                ? "bg-transparent"
-                                : "bg-primary"
+                              ? "bg-transparent"
+                              : "bg-primary"
                               }`}
                           />
                         </div>
@@ -235,8 +235,8 @@ export function AppHeader({
                           <div className="flex items-start justify-between gap-2">
                             <p
                               className={`text-sm ${notification.isRead
-                                  ? "font-medium"
-                                  : "font-semibold"
+                                ? "font-medium"
+                                : "font-semibold"
                                 }`}
                             >
                               {

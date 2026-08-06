@@ -6,10 +6,54 @@ export const settingsSchema = z.object({
       .string()
       .min(2, "Site name is required"),
 
+    siteDescription: z
+      .string()
+      .default(""),
+
+    logo: z
+      .string()
+      .default(""),
+
+    favicon: z
+      .string()
+      .default(""),
+
     supportEmail: z
       .email("Invalid email"),
 
     maintenanceMode: z.boolean(),
+  }),
+
+  company: z.object({
+    companyName: z.string(),
+
+    phone: z.string(),
+
+    whatsapp: z.string(),
+
+    address: z.string(),
+
+    gstNumber: z.string(),
+  }),
+
+  payment: z.object({
+    razorpayKeyId: z.string(),
+
+    razorpayKeySecret: z.string(),
+
+    currency: z.string(),
+  }),
+
+  email: z.object({
+    senderName: z.string(),
+
+    senderEmail: z
+      .email("Invalid email")
+      .or(z.literal("")),
+
+    replyTo: z
+      .email("Invalid email")
+      .or(z.literal("")),
   }),
 
   referral: z.object({
@@ -24,10 +68,28 @@ export const settingsSchema = z.object({
       .min(0),
   }),
 
+  seo: z.object({
+    metaTitle: z.string(),
+
+    metaDescription: z.string(),
+
+    metaKeywords: z.string(),
+  }),
+
   platform: z.object({
     currency: z.string(),
 
     allowRegistration: z.boolean(),
+
+    timezone: z.string(),
+
+    language: z.string(),
+  }),
+
+  maintenance: z.object({
+    enabled: z.boolean(),
+
+    message: z.string(),
   }),
 });
 
