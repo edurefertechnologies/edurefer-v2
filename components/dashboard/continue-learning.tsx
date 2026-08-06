@@ -16,18 +16,35 @@ export async function ContinueLearning() {
     .slice(0, 2);
   if (enrollments.length === 0) {
     return (
-      <div className="rounded-xl border bg-card p-6">
+      <div className="relative overflow-hidden rounded-3xl border-white/10 bg-gradient-to-br from-[#11253E] via-[#0D1C2F] to-[#081421] p-8">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-emerald-500 shadow-xl">
+          <BookOpen className="h-8 w-8 text-white" />
+        </div>
         <h2 className="text-lg font-semibold">
-          Continue Learning
+          Start Your Learning Journey
         </h2>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Start your learning journey by enrolling in your first course.
+          Discover AI-powered courses, earn industry certificates and build your career.
         </p>
 
         <Link
           href="/courses"
-          className="mt-4 inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          className="
+inline-flex
+items-center
+gap-2
+rounded-xl
+bg-gradient-to-r
+from-blue-600
+to-emerald-500
+px-6
+py-3
+font-semibold
+text-white
+shadow-lg
+transition
+hover:scale-105"
         >
           Explore Courses
         </Link>
@@ -37,14 +54,40 @@ export async function ContinueLearning() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-semibold">
-          Continue Learning
-        </h2>
+      <div className="absolute -right-20 -top-20 h-52 w-52 rounded-full bg-blue-500/10 blur-[120px]" />
 
-        <p className="text-sm text-muted-foreground">
-          Pick up where you left off.
-        </p>
+      <div className="absolute -left-20 bottom-0 h-52 w-52 rounded-full bg-emerald-500/10 blur-[120px]" />
+      <div className="flex items-center justify-between">
+
+        <div>
+
+          <h2 className="text-2xl font-bold text-white">
+
+            Continue Learning
+
+          </h2>
+
+          <p className="text-sm text-slate-400">
+
+            Resume where you left off
+
+          </p>
+
+        </div>
+
+        {enrollments.length > 2 && (
+
+          <Link
+            href="/my-courses"
+            className="text-cyan-300 hover:text-white"
+          >
+
+            View All →
+
+          </Link>
+
+        )}
+
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -103,10 +146,10 @@ export async function ContinueLearning() {
           return (
             <div
               key={enrollment.id}
-              className="rounded-xl border bg-card p-5"
+              className="rounded-3xl border bg-white/[0.04] backdrop-blur-xl p-5"
             >
               <div className="flex items-start gap-3">
-                <div className="rounded-lg bg-primary/10 p-2">
+                <div className="rounded-lg bg-gradient-to-br from-blue-500/20 to-emerald-500/20 p-2">
                   {completed ? (
                     <CheckCircle2 className="h-5 w-5 text-green-600" />
                   ) : (
@@ -125,15 +168,25 @@ export async function ContinueLearning() {
                   </p>
                 </div>
 
-                <span className="text-sm font-semibold">
+                <div className="rounded-full bg-blue-500/10 px-3 py-1 text-sm font-bold text-cyan-300">
+
                   {progress}%
-                </span>
+
+                </div>
               </div>
 
               <div className="mt-5">
                 <div className="h-2 overflow-hidden rounded-full bg-muted">
                   <div
-                    className="h-full bg-primary transition-all"
+                    className="
+h-full
+rounded-full
+bg-gradient-to-r
+from-blue-500
+to-emerald-500
+transition-all
+duration-700
+"
                     style={{
                       width: `${progress}%`,
                     }}
@@ -144,7 +197,24 @@ export async function ContinueLearning() {
               <div className="mt-5">
                 <Link
                   href={learningHref}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                  className="
+inline-flex
+w-full
+items-center
+justify-center
+gap-2
+rounded-xl
+bg-gradient-to-r
+from-blue-600
+to-emerald-500
+px-4
+py-3
+font-semibold
+text-white
+shadow-lg
+transition
+hover:scale-[1.02]
+"
                 >
                   {completed ? (
                     <>

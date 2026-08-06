@@ -128,30 +128,78 @@ export async function RecentActivity() {
   const recent = activities.slice(0, 8);
 
   return (
-    <div className="rounded-xl border bg-card p-6">
+    <div
+      className="
+  relative
+  overflow-hidden
+  rounded-3xl
+  border
+  border-white/10
+  bg-white/[0.04]
+  backdrop-blur-xl
+  p-7
+  transition-all
+  duration-300
+  hover:border-cyan-500/20
+  hover:shadow-[0_0_40px_rgba(59,130,246,.12)]
+  "
+    >
+      <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-cyan-500/10 blur-[100px]" />
+
+      <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-emerald-500/10 blur-[100px]" />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-2xl font-bold text-white">
             Recent Activity
           </h2>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="mt-1 text-sm text-slate-400">
             Latest updates from your account
           </p>
         </div>
 
+        <div
+          className="
+rounded-full
+border
+border-emerald-500/20
+bg-emerald-500/10
+px-3
+py-1
+text-xs
+font-semibold
+text-emerald-300
+">
+          {recent.length} Updates
+        </div>
+
         <Link
           href="/notifications"
-          className="text-sm font-medium text-primary hover:underline"
+          className="text-sm font-semibold text-cyan-300 transition hover:text-white"
         >
-          View All
+          View Timeline →
         </Link>
       </div>
 
       {recent.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No activity yet.
-        </p>
+        <div className="py-12 text-center">
+
+          <Wallet className="mx-auto h-12 w-12 text-slate-500" />
+
+          <h3 className="mt-5 text-lg font-semibold text-white">
+
+            No Recent Activity
+
+          </h3>
+
+          <p className="mt-2 text-sm text-slate-400">
+
+            Your learning, wallet and orders will appear here.
+
+          </p>
+
+        </div>
       ) : (
         <div className="space-y-4">
           {recent.map((activity) => (
@@ -159,21 +207,44 @@ export async function RecentActivity() {
               key={`${activity.title}-${activity.id}`}
               className="flex items-start gap-3"
             >
-              <div className="rounded-lg bg-primary/10 p-2">
-                <activity.icon className="h-4 w-4 text-primary" />
+              <div className="
+flex
+h-11
+w-11
+items-center
+justify-center
+rounded-2xl
+bg-gradient-to-br
+from-blue-500/20
+to-emerald-500/20
+ring-1
+ring-white/10
+">
+                <activity.icon className="h-5 w-5 text-cyan-300" />
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="font-medium">
+                <p className="font-semibold text-white">
                   {activity.title}
                 </p>
 
-                <p className="truncate text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-slate-400">
                   {activity.description}
                 </p>
               </div>
 
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
+              <span
+                className="
+rounded-full
+border
+border-white/10
+bg-white/5
+px-3
+py-1
+text-[11px]
+font-medium
+text-slate-400
+">
                 {new Date(
                   activity.date
                 ).toLocaleDateString("en-IN", {
