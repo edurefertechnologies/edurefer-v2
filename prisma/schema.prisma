@@ -250,9 +250,8 @@ model CourseModule {
   course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   lessons Lesson[]
 
-  @@index([courseId])
-
   @@unique([courseId, sortOrder])
+  @@index([courseId])
 }
 
 model Lesson {
@@ -330,24 +329,27 @@ model CourseWishlist {
 }
 
 model AIWallet {
-  id           String          @id @default(cuid())
-  userId       String          @unique
-  balance      Int             @default(0)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  transactions AITransaction[]
-  usages       AIUsage[]
-  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String          @id @default(cuid())
+  userId           String          @unique
+  balance          Int             @default(0)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  transactions     AITransaction[]
+  usages           AIUsage[]
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyFreeCredits Int             @default(5)
+  lastDailyReward  DateTime?
 }
 
 model AITransaction {
-  id          String            @id @default(cuid())
+  id          String              @id @default(cuid())
   walletId    String
   type        AITransactionType
   credits     Int
   description String?
-  createdAt   DateTime          @default(now())
-  wallet      AIWallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  createdAt   DateTime            @default(now())
+  wallet      AIWallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  reason      AITransactionReason
 
   @@index([walletId])
 }
@@ -359,8 +361,37 @@ model AIConversation {
   title     String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  usages    AIUsage[]
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  usages AIUsage[]
+
+  messages AIMessage[]
+}
+
+model AIMessage {
+  id             String @id @default(cuid())
+  conversationId String
+
+  role MessageRole
+
+  content String @db.Text
+
+  creditsUsed Int @default(0)
+
+  promptTokens Int?
+
+  completionTokens Int?
+
+  totalTokens Int?
+
+  createdAt DateTime @default(now())
+
+  status MessageStatus @default(COMPLETED)
+
+  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
 
 model AIUsage {
@@ -518,6 +549,21 @@ enum UserStatus {
   SUSPENDED
 }
 
+enum MessageStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum AITransactionReason {
+  COURSE_PURCHASE
+  REFERRAL
+  DAILY_BONUS
+  ADMIN_BONUS
+  AI_USAGE
+  REFUND
+}
+
 enum ProductType {
   PDF
   COURSE
@@ -600,12 +646,18 @@ enum CourseLevel {
 }
 
 enum AIService {
+  EDUREFER_ASSISTANT
   RESUME_BUILDER
   INTERVIEW_ASSISTANT
   CAREER_MENTOR
   QUIZ_GENERATOR
   NOTES_GENERATOR
   CODE_ASSISTANT
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
 }
 
 enum AITransactionType {
