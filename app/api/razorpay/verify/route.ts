@@ -1,3 +1,6 @@
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { PaymentStatus } from "@prisma/client";
