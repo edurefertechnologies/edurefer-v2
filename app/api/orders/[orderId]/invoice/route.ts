@@ -58,7 +58,7 @@ export async function GET(
               },
             },
 
-            bundle: true,
+            package: true,
           },
         },
       },
@@ -288,7 +288,7 @@ export async function GET(
       const itemName =
         item.product?.course?.title ??
         item.product?.name ??
-        item.bundle?.name ??
+        item.package?.name ??
         "Item";
 
       // Keep long item names inside invoice

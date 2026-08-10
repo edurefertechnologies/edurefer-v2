@@ -1,251 +1,229 @@
+"use client";
+
 import {
-  Camera,
   CheckCircle2,
   FileText,
   Wallet,
   Brain,
   Award,
-  Pencil,
 } from "lucide-react";
 
-export function ProfileCompletion() {
-  const completion = 82;
+import { useState } from "react";
 
-  interface Props {
-    profile: UserWithRelations;
-  }
+import { ProfilePhoto } from "./profile-photo";
 
-  export function ProfileCompletion({
-    profile,
-  }: Props) {
+interface ProfileCompletionProps {
+  profile: any;
+}
 
-    return (
-      <div className="space-y-6">
+function calculateProfileCompletion(profile: any) {
+  const fields = [
+    profile?.firstName,
+    profile?.lastName,
+    profile?.phone,
+    profile?.profile?.headline,
+    profile?.profile?.bio,
+    profile?.profile?.address,
+    profile?.profile?.city,
+    profile?.profile?.state,
+    profile?.profile?.country,
+    profile?.profile?.pincode,
+    profile?.profile?.college,
+    profile?.profile?.university,
+    profile?.profile?.degree,
+    profile?.profile?.branch,
+    profile?.profile?.passingYear,
+    profile?.profile?.currentCompany,
+    profile?.profile?.designation,
+    profile?.profile?.experience,
+    profile?.profile?.linkedin,
+    profile?.profile?.github,
+    profile?.profile?.portfolio,
+    profile?.profile?.website,
+  ];
 
-        {/* Profile Card */}
+  const completed = fields.filter(
+    (value) =>
+      value !== null &&
+      value !== undefined &&
+      String(value).trim() !== ""
+  ).length;
 
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl">
+  return Math.round(
+    (completed / fields.length) * 100
+  );
+}
 
-          <div className="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-cyan-500/10 blur-[100px]" />
+export function ProfileCompletion({
+  profile,
+}: ProfileCompletionProps) {
+  const [profileImage, setProfileImage] =
+    useState<string | null>(
+      profile?.image ?? null
+    );
 
-          <div className="relative z-10">
+  const completion =
+    calculateProfileCompletion(profile);
 
-            {/* Avatar */}
+  return (
+    <div className="space-y-6">
 
-            <div className="relative mx-auto h-36 w-36">
+      {/* Profile Card */}
 
-              <div className="flex h-full w-full items-center justify-center rounded-full border-4 border-cyan-400/30 bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
+      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.04] p-7 backdrop-blur-xl">
 
-                {profile.image ? (
-                  <Image
-                    src={profile.image}
-                    alt="Profile"
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                ) : (
-                  profile.firstName?.charAt(0)
-                )}
+        <div className="absolute -right-12 -top-12 h-44 w-44 rounded-full bg-cyan-500/10 blur-[100px]" />
 
-              </div>
+        <div className="relative z-10">
 
-              <button
-                className="
-              absolute
-              bottom-2
-              right-2
-              flex
-              h-11
-              w-11
-              items-center
-              justify-center
-              rounded-full
-              bg-gradient-to-r
-              from-blue-600
-              to-emerald-500
-              shadow-lg
-              transition
-              hover:scale-105
-              "
-              >
-                <Camera className="h-5 w-5 text-white" />
-              </button>
-
-            </div>
-
-            {/* User */}
-
-            <div className="mt-6 text-center">
-
-              <h2 className="text-2xl font-bold text-white">
-                {profile.firstName} {profile.lastName}
-              </h2>
-
-              <p className="mt-1 text-sm text-slate-400">
-                Computer Science Student
-              </p>
-
-              <button
-                className="
-              mt-4
-              inline-flex
-              items-center
-              gap-2
-              rounded-xl
-              border
-              border-white/10
-              bg-white/5
-              px-4
-              py-2
-              text-sm
-              text-white
-              transition
-              hover:bg-white/10
-              "
-              >
-                <Pencil className="h-4 w-4" />
-
-                Edit Profile
-
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Completion */}
-
-        <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
-
-          <div className="flex items-center justify-between">
-
-            <h3 className="font-bold text-white">
-
-              Profile Completion
-
-            </h3>
-
-            <span className="text-xl font-black text-cyan-300">
-
-              {completion}%
-
-            </span>
-
-          </div>
-
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
-
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400"
-              style={{
-                width: `${completion}%`,
-              }}
-            />
-
-          </div>
-
-          <p className="mt-4 text-sm text-slate-400">
-
-            Complete your profile to unlock better
-            course recommendations and career guidance.
-
-          </p>
-
-        </div>
-
-        {/* Quick Stats */}
-
-        <div className="grid grid-cols-2 gap-4">
-
-          <Card
-            icon={<Award className="h-5 w-5" />}
-            title="Certificates"
-            value="12"
+          <ProfilePhoto
+            image={profileImage}
+            firstName={profile?.firstName ?? ""}
+            onUploaded={(image) => {
+              setProfileImage(image);
+            }}
           />
 
-          <Card
-            icon={<Wallet className="h-5 w-5" />}
-            title="Wallet"
-            value="₹450"
-          />
+          <div className="mt-6 text-center">
 
-          <Card
-            icon={<Brain className="h-5 w-5" />}
-            title="AI Credits"
-            value="280"
-          />
+            <h2 className="text-2xl font-bold text-white">
+              {profile?.firstName} {profile?.lastName}
+            </h2>
 
-          <Card
-            icon={<FileText className="h-5 w-5" />}
-            title="Resume"
-            value="Uploaded"
-          />
-
-        </div>
-
-        {/* Verification */}
-
-        <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-5">
-
-          <div className="flex items-center gap-3">
-
-            <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-
-            <div>
-
-              <h4 className="font-semibold text-white">
-
-                Email Verified
-
-              </h4>
-
-              <p className="text-sm text-slate-300">
-
-                Your account is verified.
-
-              </p>
-
-            </div>
+            <p className="mt-1 text-sm text-slate-400">
+              {profile?.email}
+            </p>
 
           </div>
 
         </div>
 
       </div>
-    );
-  }
 
-  function Card({
-    icon,
-    title,
-    value,
-  }: {
-    icon: React.ReactNode;
-    title: string;
-    value: string;
-  }) {
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+      {/* Completion */}
 
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 text-cyan-300">
+      <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
 
-          {icon}
+        <div className="flex items-center justify-between">
+
+          <h3 className="font-bold text-white">
+            Profile Completion
+          </h3>
+
+          <span className="text-xl font-black text-cyan-300">
+            {completion}%
+          </span>
 
         </div>
 
-        <p className="mt-4 text-xs uppercase tracking-wider text-slate-400">
+        <div className="mt-5 h-3 overflow-hidden rounded-full bg-white/10">
 
-          {title}
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-500"
+            style={{
+              width: `${completion}%`,
+            }}
+          />
 
+        </div>
+
+        <p className="mt-4 text-sm text-slate-400">
+          Complete your profile to unlock better
+          course recommendations and career guidance.
         </p>
 
-        <h3 className="mt-2 text-xl font-bold text-white">
+      </div>
 
-          {value}
+      {/* Quick Stats */}
 
-        </h3>
+      <div className="grid grid-cols-2 gap-4">
+
+        <Card
+          icon={<Award className="h-5 w-5" />}
+          title="Certificates"
+          value={String(profile?.enrollments?.filter(
+            (enrollment: any) => enrollment.certificate
+          ).length ?? 0)}
+        />
+
+        <Card
+          icon={<Wallet className="h-5 w-5" />}
+          title="Wallet"
+          value={`₹${Number(profile?.wallet?.balance ?? 0).toLocaleString("en-IN")}`}
+        />
+
+        <Card
+          icon={<Brain className="h-5 w-5" />}
+          title="AI Credits"
+          value={Number(
+            profile?.aiWallet?.balance ?? 0
+          ).toLocaleString("en-IN")}
+        />
+
+        <Card
+          icon={<FileText className="h-5 w-5" />}
+          title="Resume"
+          value="—"
+        />
 
       </div>
-    );
-  }
+
+      {/* Verification */}
+
+      <div className="rounded-3xl border border-emerald-500/20 bg-emerald-500/10 p-5">
+
+        <div className="flex items-center gap-3">
+
+          <CheckCircle2 className="h-6 w-6 text-emerald-400" />
+
+          <div>
+
+            <h4 className="font-semibold text-white">
+              {profile?.emailVerified
+                ? "Email Verified"
+                : "Email Not Verified"}
+            </h4>
+
+            <p className="text-sm text-slate-300">
+              {profile?.emailVerified
+                ? "Your account is verified."
+                : "Please verify your email address."}
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
+
+function Card({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20 text-cyan-300">
+        {icon}
+      </div>
+
+      <p className="mt-4 text-xs uppercase tracking-wider text-slate-400">
+        {title}
+      </p>
+
+      <h3 className="mt-2 text-xl font-bold text-white">
+        {value}
+      </h3>
+
+    </div>
+  );
+}

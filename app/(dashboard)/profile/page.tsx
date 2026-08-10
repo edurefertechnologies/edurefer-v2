@@ -1,37 +1,71 @@
-import { ProfileHeader } from "@/components/profile/profile-header";
+import ProfileHeader from "@/components/profile/profile-header";
 import { ProfileDetails } from "@/components/profile/profile-details";
 import { ProfileCompletion } from "@/components/profile/profile-completion";
-import { getSession } from "@/lib/session";
 
-const session = await getSession();
+import { getProfile } from "@/actions/profile/get-profile";
 
-const profile = await prisma.user.findUnique({
-  where: {
-    id: session.user.id,
-  },
+export default async function ProfilePage() {
+  const data = await getProfile();
 
-  include: {
-    aiWallet: true,
-    certificates: true,
-    enrollments: true,
-    orders: true,
-  },
-});
-export default function ProfilePage() {
+  const profile = {
+    id: data.id,
+    firstName: data.firstName ?? "",
+    lastName: data.lastName ?? "",
+    email: data.email ?? "",
+    phone: data.phone ?? "",
+    image: data.image ?? null,
+    emailVerified: data.emailVerified ?? false,
+
+    profile: data.profile
+      ? {
+          headline: data.profile.headline ?? "",
+          bio: data.profile.bio ?? "",
+          address: data.profile.address ?? "",
+          city: data.profile.city ?? "",
+          state: data.profile.state ?? "",
+          country: data.profile.country ?? "",
+          pincode: data.profile.pincode ?? "",
+
+          college: data.profile.college ?? "",
+          university: data.profile.university ?? "",
+          degree: data.profile.degree ?? "",
+          branch: data.profile.branch ?? "",
+
+          passingYear: data.profile.passingYear ?? null,
+
+          currentCompany:
+            data.profile.currentCompany ?? "",
+
+          designation:
+            data.profile.designation ?? "",
+
+          experience:
+            data.profile.experience ?? null,
+
+          linkedin:
+            data.profile.linkedin ?? "",
+
+          github:
+            data.profile.github ?? "",
+
+          portfolio:
+            data.profile.portfolio ?? "",
+
+          website:
+            data.profile.website ?? "",
+        }
+      : null,
+  };
 
   return (
     <div className="space-y-6">
-
       <ProfileHeader />
 
       <div className="grid gap-6 xl:grid-cols-[380px_1fr]">
-
         <ProfileCompletion profile={profile} />
 
-        <ProfileDetails />
-
+        <ProfileDetails profile={profile} />
       </div>
-
     </div>
   );
 }

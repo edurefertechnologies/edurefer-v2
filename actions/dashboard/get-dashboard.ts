@@ -119,6 +119,7 @@ export async function getDashboard() {
       take: 5,
     }),
   ]);
+
   const activeCourses = enrollments.filter(
     (course) => course.status === "ACTIVE"
   ).length;

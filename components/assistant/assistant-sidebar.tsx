@@ -53,7 +53,13 @@ const actions = [
   },
 ];
 
-export function AssistantSidebar() {
+interface AssistantSidebarProps {
+  aiCredits: number;
+}
+
+export function AssistantSidebar({
+  aiCredits,
+}: AssistantSidebarProps) {
   return (
     <div className="space-y-6">
 
@@ -64,13 +70,10 @@ export function AssistantSidebar() {
         <div className="mb-5 flex items-center gap-3">
 
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
-
             <Sparkles className="h-5 w-5 text-cyan-300" />
-
           </div>
 
           <div>
-
             <h3 className="font-bold text-white">
               Quick Actions
             </h3>
@@ -78,45 +81,48 @@ export function AssistantSidebar() {
             <p className="text-xs text-slate-400">
               Most used services
             </p>
-
           </div>
 
         </div>
 
         <div className="space-y-3">
 
-          {actions.map((item) => (
-            <Link
-              key={item.title}
-              href={item.href}
-              className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:border-cyan-500/20 hover:bg-white/10"
-            >
-              <div className="flex items-center gap-3">
+          {actions.map((item) => {
+            const Icon = item.icon;
 
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:border-cyan-500/20 hover:bg-white/10"
+              >
+                <div className="flex items-center gap-3">
 
-                  <item.icon className="h-5 w-5 text-cyan-300" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
+
+                    <Icon className="h-5 w-5 text-cyan-300" />
+
+                  </div>
+
+                  <div>
+
+                    <p className="font-medium text-white">
+                      {item.title}
+                    </p>
+
+                    <p className="text-xs text-slate-400">
+                      {item.description}
+                    </p>
+
+                  </div>
 
                 </div>
 
-                <div>
+                <ChevronRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-300" />
 
-                  <p className="font-medium text-white">
-                    {item.title}
-                  </p>
-
-                  <p className="text-xs text-slate-400">
-                    {item.description}
-                  </p>
-
-                </div>
-
-              </div>
-
-              <ChevronRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-300" />
-
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
 
         </div>
 
@@ -131,17 +137,11 @@ export function AssistantSidebar() {
         </p>
 
         <h2 className="mt-3 text-4xl font-black text-white">
-          {Wallet.aI.toLocaleString()}
+          {aiCredits.toLocaleString()}
         </h2>
 
-        <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-
-          <div className="h-full w-[65%] rounded-full bg-gradient-to-r from-cyan-400 to-emerald-400" />
-
-        </div>
-
-        <p className="mt-3 text-xs text-slate-300">
-          Purchase courses to earn more AI Credits.
+        <p className="mt-2 text-sm text-slate-300">
+          Available AI Credits
         </p>
 
         <Link

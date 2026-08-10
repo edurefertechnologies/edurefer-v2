@@ -58,7 +58,7 @@ export async function getOrderDetails(
             },
           },
 
-          bundle: {
+          package: {
             select: {
               id: true,
               name: true,

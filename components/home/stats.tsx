@@ -41,9 +41,9 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section className="section">
+    <section className="relative py-16 sm:py-20">
       <Container>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
           {stats.map((item, index) => {
             const Icon = item.icon;
 
@@ -57,17 +57,74 @@ export default function Stats() {
                   duration: 0.5,
                   delay: index * 0.08,
                 }}
-                className="glass-card hover-lift text-center"
+                className="
+                  group
+                  relative
+                  overflow-hidden
+                  rounded-3xl
+                  border
+                  border-white/10
+                  bg-white/[0.04]
+                  p-7
+                  text-center
+                  backdrop-blur-xl
+                  transition-all
+                  duration-300
+                  hover:-translate-y-1
+                  hover:border-cyan-400/30
+                  hover:bg-white/[0.07]
+                  hover:shadow-[0_20px_50px_rgba(0,0,0,0.25)]
+                "
               >
-                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                {/* Glow */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    -right-10
+                    -top-10
+                    h-28
+                    w-28
+                    rounded-full
+                    bg-cyan-400/10
+                    blur-3xl
+                    transition-all
+                    duration-300
+                    group-hover:bg-cyan-400/20
+                  "
+                />
+
+                {/* Icon */}
+                <div
+                  className="
+                    relative
+                    mx-auto
+                    mb-5
+                    flex
+                    h-14
+                    w-14
+                    items-center
+                    justify-center
+                    rounded-2xl
+                    border
+                    border-cyan-400/10
+                    bg-cyan-400/10
+                    text-cyan-300
+                    transition-transform
+                    duration-300
+                    group-hover:scale-105
+                  "
+                >
                   <Icon className="h-7 w-7" />
                 </div>
 
-                <h3 className="text-3xl font-bold text-foreground">
+                {/* Value */}
+                <h3 className="relative text-3xl font-bold tracking-tight text-white">
                   {item.value}
                 </h3>
 
-                <p className="mt-2 text-sm text-muted-foreground">
+                {/* Label */}
+                <p className="relative mt-2 text-sm text-slate-400">
                   {item.label}
                 </p>
               </motion.div>

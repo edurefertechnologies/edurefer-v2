@@ -9,27 +9,29 @@ datasource db {
 }
 
 model User {
-  id              String           @id @default(cuid())
-  firstName       String
-  lastName        String?
-  username        String?          @unique
-  email           String           @unique
-  phone           String?          @unique
-  role            UserRole         @default(STUDENT)
-  provider        AuthProvider     @default(CREDENTIALS)
-  status          UserStatus       @default(ACTIVE)
-  referralCode    String?          @unique
-  referredById    String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  isDeleted       Boolean          @default(false)
-  lastLogin       DateTime?
-  name            String?
-  emailVerified   Boolean          @default(false)
-  image           String?
-  banExpires      DateTime?
-  banReason       String?
-  banned          Boolean          @default(false)
+  id            String       @id @default(cuid())
+  firstName     String
+  lastName      String?
+  username      String?      @unique
+  email         String       @unique
+  phone         String?      @unique
+  role          UserRole     @default(STUDENT)
+  profile       UserProfile?
+  provider      AuthProvider @default(CREDENTIALS)
+  status        UserStatus   @default(ACTIVE)
+  referralCode  String?      @unique
+  referredById  String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  isDeleted     Boolean      @default(false)
+  lastLogin     DateTime?
+  name          String?
+  emailVerified Boolean      @default(false)
+  image         String?
+  banExpires    DateTime?
+  banReason     String?
+  banned        Boolean      @default(false)
+
   aiConversations AIConversation[]
   aiWallet        AIWallet?
   auditLogs       AuditLog[]
@@ -45,12 +47,70 @@ model User {
   wallet          Wallet?
   accounts        Account[]
   sessions        Session[]
-  referredBy      User?            @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals       User[]           @relation("UserReferrals")
+
+  referredBy User?  @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals  User[] @relation("UserReferrals")
+
+  resumes UserResume[]
 
   @@index([email])
   @@index([referralCode])
   @@map("user")
+}
+
+model UserResume {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title    String @default("My Resume")
+  template String @default("professional")
+
+  data Json
+
+  pdfUrl String?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([userId, isDefault])
+}
+
+model UserProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resumeName       String?
+  resumeSize       Int?
+  resumeUploadedAt DateTime?
+  headline         String?
+  bio              String?   @db.Text
+  dateOfBirth      DateTime?
+  gender           Gender?
+  address          String?
+  city             String?
+  state            String?
+  country          String?
+  pincode          String?
+  college          String?
+  university       String?
+  degree           String?
+  branch           String?
+  passingYear      Int?
+  currentCompany   String?
+  designation      String?
+  experience       Int?
+  linkedin         String?
+  github           String?
+  portfolio        String?
+  website          String?
+  resumeUrl        String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 }
 
 model Product {
@@ -536,6 +596,12 @@ model PackageItem {
 enum UserRole {
   STUDENT
   ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
 
 enum AuthProvider {
