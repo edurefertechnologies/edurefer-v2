@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 
 import {
@@ -53,12 +55,33 @@ const actions = [
   },
 ];
 
+interface Conversation {
+  id: string;
+  title: string | null;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+  messages: {
+    id: string;
+    role: "USER" | "ASSISTANT";
+    content: string;
+    createdAt: Date | string;
+  }[];
+}
+
 interface AssistantSidebarProps {
   aiCredits: number;
+  conversations: Conversation[];
+  activeConversationId: string | null;
+  onSelectConversation: (
+    conversationId: string
+  ) => void;
 }
 
 export function AssistantSidebar({
   aiCredits,
+  conversations,
+  activeConversationId,
+  onSelectConversation,
 }: AssistantSidebarProps) {
   return (
     <div className="space-y-6">
@@ -96,6 +119,7 @@ export function AssistantSidebar({
                 href={item.href}
                 className="group flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:border-cyan-500/20 hover:bg-white/10"
               >
+
                 <div className="flex items-center gap-3">
 
                   <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
@@ -153,7 +177,15 @@ export function AssistantSidebar({
 
       </div>
 
-      <AssistantHistory />
+      {/* Conversation History */}
+
+      <AssistantHistory
+        conversations={conversations}
+        activeConversationId={
+          activeConversationId
+        }
+        onSelect={onSelectConversation}
+      />
 
       {/* Support */}
 

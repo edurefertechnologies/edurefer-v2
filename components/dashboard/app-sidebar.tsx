@@ -25,7 +25,9 @@ import {
 type AppSidebarProps = {
   user: {
     firstName?: string | null;
+    lastName?: string | null;
     email: string;
+    image?: string | null;
   };
 };
 
@@ -319,15 +321,50 @@ export function AppSidebar({
       </SidebarContent>
       <SidebarFooter className="border-t border-white/10 p-4">
 
-        <div className="mb-4">
+        <div className="mb-4 flex items-center gap-3">
 
-          <h3 className="font-semibold text-white">
-            {user.firstName ?? "Student"}
-          </h3>
+          {/* Profile Photo */}
 
-          <p className="text-xs text-slate-400">
-            Student
-          </p>
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cyan-400/20 bg-gradient-to-br from-blue-500/20 to-emerald-500/20">
+
+            {user.image ? (
+              <Image
+                src={user.image}
+                alt={
+                  user.firstName
+                    ? `${user.firstName}'s profile`
+                    : "Profile"
+                }
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-lg font-bold text-cyan-300">
+                {user.firstName
+                  ?.charAt(0)
+                  ?.toUpperCase() || "S"}
+              </span>
+            )}
+
+          </div>
+
+          {/* User Info */}
+
+          <div className="min-w-0">
+
+            <h3 className="truncate font-semibold text-white">
+              {user.firstName ?? "Student"}
+              {user.lastName
+                ? ` ${user.lastName}`
+                : ""}
+            </h3>
+
+            <p className="truncate text-xs text-slate-400">
+              {user.email}
+            </p>
+
+          </div>
 
         </div>
 

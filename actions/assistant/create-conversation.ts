@@ -4,7 +4,6 @@ import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
 
 export async function createConversation() {
-
   const session = await getSession();
 
   if (!session) {
@@ -18,5 +17,4 @@ export async function createConversation() {
       title: "New Conversation",
     },
   });
-
 }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 
 import { getSession } from "@/lib/auth-server";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
@@ -22,6 +23,20 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      image: true,
+      emailVerified: true,
+    },
+  });
+
   const notificationData =
     await getNotifications(8);
   return (
@@ -37,7 +52,7 @@ export default async function DashboardLayout({
         {/* Grid */}
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
-        <AppSidebar user={session.user} />
+        <AppSidebar user={user ?? session.user} />
 
         <SidebarInset className="relative z-10 bg-transparent">
 
