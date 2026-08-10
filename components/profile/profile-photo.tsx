@@ -3,6 +3,8 @@
 import { useRef, useState } from "react";
 import { Camera, Loader2 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 interface ProfilePhotoProps {
   image: string | null;
   firstName: string;
@@ -21,6 +23,8 @@ export function ProfilePhoto({
 
   const [error, setError] =
     useState("");
+
+  const router = useRouter();
 
   async function handleFileChange(
     event: React.ChangeEvent<HTMLInputElement>
@@ -64,7 +68,7 @@ export function ProfilePhoto({
       ) {
         throw new Error(
           signData.error ||
-            "Failed to prepare upload."
+          "Failed to prepare upload."
         );
       }
 
@@ -142,11 +146,12 @@ export function ProfilePhoto({
       ) {
         throw new Error(
           updateData.error ||
-            "Failed to save profile photo."
+          "Failed to save profile photo."
         );
       }
 
       onUploaded(imageUrl);
+      router.refresh();
     } catch (error) {
       console.error(
         "PROFILE_PHOTO_UPLOAD_ERROR:",
