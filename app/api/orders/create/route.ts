@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { razorpay } from "@/lib/razorpay";
+import { getRazorpay } from "@/lib/razorpay";
 import { getSession } from "@/lib/auth-server";
 import { generateOrderNumber } from "@/lib/order";
 
@@ -112,6 +112,8 @@ export async function POST(req: Request) {
       {
         timeout: 15000, // 15 seconds
       });
+
+    const razorpay = getRazorpay();
 
     const razorpayOrder = await razorpay.orders.create({
       amount: Math.round(amount * 100),

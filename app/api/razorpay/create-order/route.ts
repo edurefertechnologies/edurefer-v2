@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { razorpay } from "@/lib/razorpay";
+import { getRazorpay } from "@/lib/razorpay";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
         { status: 404 }
       );
     }
+
+    const razorpay = getRazorpay();
 
     const order = await razorpay.orders.create({
       amount: Number(course.product.price) * 100,
