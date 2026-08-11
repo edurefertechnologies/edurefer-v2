@@ -18,13 +18,12 @@ export default function HomeNavbar() {
           className="flex items-center gap-3"
           onClick={() => setOpen(false)}
         >
-          <div className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/20 bg-white/5">
+          <div className="relative flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-400/20 bg-white/5 p-2">
             <Image
               src="/logo.png"
               alt="Edurefer"
-              width={34}
-              height={28}
-              className="object-contain"
+              fill
+              className="object-contain p-1"
             />
           </div>
 

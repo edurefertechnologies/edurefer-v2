@@ -83,17 +83,19 @@ export default function Hero() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/courses">
-                <Button size="lg">
-                  Explore Learning Paths
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
+              <Link
+                href="/courses"
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+              >
+                Explore Learning Paths
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
 
-              <Link href="/about">
-                <Button variant="outline" size="lg">
-                  View Bundles
-                </Button>
+              <Link
+                href="#bundles"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10"
+              >
+                View Bundles
               </Link>
             </div>
           </motion.div>
@@ -219,18 +221,18 @@ export default function Hero() {
             return (
               <div
                 key={item.label}
-                className="glass-card hover-lift flex items-center gap-4 rounded-2xl border border-white/10 transition-all duration-300 hover:border-primary/20"
+                className="glass-card hover-lift flex min-h-[110px] items-center gap-5 rounded-2xl border border-white/10 px-6 py-5 transition-all duration-300 hover:border-primary/20"
               >
-                <div className="rounded-2xl border border-primary/10 bg-primary/10 p-3 text-primary">
-                  <Icon className="h-6 w-6" />
+                <div className="rounded-2xl border border-primary/10 bg-primary/10 p-4 text-primary">
+                  <Icon className="h-7 w-7" />
                 </div>
 
                 <div>
-                  <h3 className="text-2xl font-bold">
+                  <h3 className="text-3xl font-bold">
                     {item.value}
                   </h3>
 
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-base text-muted-foreground">
                     {item.label}
                   </p>
                 </div>
