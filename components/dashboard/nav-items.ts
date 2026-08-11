@@ -40,7 +40,7 @@ export const navItems = [
   },
   {
     title: "AI Assistant",
-    href: "/ai",
+    href: "/assistant",
     icon: Brain,
   },
   {

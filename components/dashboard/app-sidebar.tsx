@@ -17,11 +17,6 @@ import {
 import { LogoutButton } from "@/components/auth/logout-button";
 import { navItems } from "./nav-items";
 
-import {
-  Sparkles,
-  Crown,
-} from "lucide-react";
-
 type AppSidebarProps = {
   user: {
     firstName?: string | null;
