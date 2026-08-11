@@ -1,23 +1,38 @@
-import Navbar from "@/components/layout/navbar";
 import Hero from "@/components/home/hero";
-import Trusted from "@/components/home/trusted";
-import Footer from "@/components/layout/footer";
-import Features from "@/components/home/features";
-import Courses from "@/components/home/courses";
-import AITools from "@/components/home/ai-tools";
+import Stats from "@/components/home/stats";
+import LearningProcess from "@/components/home/learning-process";
+import Testimonials from "@/components/home/testimonials";
+import PlacementPartners from "@/components/home/placement-partners";
+import CTA from "@/components/home/cta";
+import FAQ from "@/components/home/faq";
+import Newsletter from "@/components/home/newsletter";
 import Pricing from "@/components/home/pricing";
 
-export default function HomePage() {
+import { getPricingProducts } from "@/actions/products/get-pricing-products";
+
+export default async function HomePage() {
+  const pricingData =
+    await getPricingProducts();
+
   return (
     <>
-      <Navbar />
       <Hero />
-      <Trusted />
-      <Features />
-      <Courses />
-      <AITools />
-      <Pricing />
-      <Footer />
+
+      <Stats />
+
+      <LearningProcess />
+
+      <Pricing data={pricingData} />
+
+      <Testimonials />
+
+      <PlacementPartners />
+
+      <CTA />
+
+      <FAQ />
+
+      <Newsletter />
     </>
   );
 }
