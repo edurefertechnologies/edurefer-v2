@@ -631,6 +631,7 @@ enum AITransactionReason {
 }
 
 enum ProductType {
+  PACKAGE
   PDF
   COURSE
   AI_CREDITS
