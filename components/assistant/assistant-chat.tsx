@@ -40,6 +40,12 @@ interface AssistantChatProps {
   onConversationSelected: (
     conversationId: string
   ) => void;
+
+  onCreditsUpdated: (credits: number) => void;
+
+  onSuggestionSelected: (suggestion: string) => void;
+
+  selectedSuggestion: string | null;
 }
 
 const suggestions = [
@@ -47,26 +53,31 @@ const suggestions = [
     icon: GraduationCap,
     title: "Course Help",
     description: "Recommend a course for me",
+    prompt: "Recommend a course for me",
   },
   {
     icon: CreditCard,
     title: "Orders",
     description: "Check my recent orders",
+    prompt: "Check my recent orders",
   },
   {
     icon: Award,
     title: "Certificates",
     description: "How can I download my certificate?",
+    prompt: "How can I download my certificate?",
   },
   {
     icon: Wallet,
     title: "Wallet",
     description: "How do referral rewards work?",
+    prompt: "How do referral rewards work?",
   },
   {
     icon: Briefcase,
     title: "Career",
     description: "Help me prepare for interviews",
+    prompt: "Help me prepare for interviews",
   },
 ];
 
@@ -76,6 +87,9 @@ export function AssistantChat({
   onConversationsLoaded,
   onConversationSelected,
   onCreateConversation,
+  onCreditsUpdated,
+  onSuggestionSelected,
+  selectedSuggestion,
 }: AssistantChatProps) {
   const activeConversation =
     conversations.find(
@@ -226,6 +240,9 @@ export function AssistantChat({
                     <button
                       key={item.title}
                       type="button"
+                      onClick={() =>
+                        onSuggestionSelected(item.description)
+                      }
                       className="group rounded-2xl border border-white/10 bg-white/5 p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-cyan-500/20 hover:bg-white/10"
                     >
 
@@ -297,6 +314,12 @@ export function AssistantChat({
           }
           onConversationCreated={
             onCreateConversation
+          }
+          onCreditsUpdated={
+            onCreditsUpdated
+          }
+          suggestion={
+            selectedSuggestion
           }
         />
 

@@ -23,12 +23,18 @@ interface AssistantInputProps {
   ) => void;
 
   onConversationCreated: () => Promise<string>;
+
+  onCreditsUpdated: (credits: number) => void;
+
+  suggestion?: string | null;
 }
 
 export function AssistantInput({
   conversationId,
   onMessageAdded,
   onConversationCreated,
+  onCreditsUpdated,
+  suggestion,
 }: AssistantInputProps) {
   const [message, setMessage] =
     useState("");
@@ -58,9 +64,14 @@ export function AssistantInput({
       );
     }, 3000);
 
-    return () =>
-      clearInterval(interval);
+    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (suggestion) {
+      setMessage(suggestion);
+    }
+  }, [suggestion]);
 
   async function handleSend() {
     const cleanMessage =
@@ -107,10 +118,19 @@ export function AssistantInput({
       /*
        * Send to server / AI
        */
+
       const result = await sendMessage(
         currentConversationId,
         cleanMessage
       );
+
+      if (
+        typeof result.remainingCredits === "number"
+      ) {
+        onCreditsUpdated(
+          result.remainingCredits
+        );
+      }
 
       /*
        * Show AI response

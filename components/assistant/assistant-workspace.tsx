@@ -30,6 +30,12 @@ interface AssistantWorkspaceProps {
 export function AssistantWorkspace({
   aiCredits,
 }: AssistantWorkspaceProps) {
+  const [currentCredits, setCurrentCredits] =
+    useState(aiCredits);
+
+  const [selectedSuggestion, setSelectedSuggestion] =
+    useState<string | null>(null);
+
   const [conversations, setConversations] =
     useState<Conversation[]>([]);
 
@@ -157,10 +163,19 @@ export function AssistantWorkspace({
         onCreateConversation={
           handleCreateConversation
         }
+        onCreditsUpdated={
+          setCurrentCredits
+        }
+        onSuggestionSelected={
+          setSelectedSuggestion
+        }
+        selectedSuggestion={
+          selectedSuggestion
+        }
       />
 
       <AssistantSidebar
-        aiCredits={aiCredits}
+        aiCredits={currentCredits}
         conversations={conversations}
         activeConversationId={
           activeConversationId
