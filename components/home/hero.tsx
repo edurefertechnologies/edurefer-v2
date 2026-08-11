@@ -6,6 +6,7 @@ import { ArrowRight, BookOpen, Briefcase, Award } from "lucide-react";
 
 import Container from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
+import HomeNavbar from "./home-navbar";
 
 const heroData = {
   user: {
@@ -51,6 +52,8 @@ export default function Hero() {
       {/* Background Effects */}
       <div className="absolute inset-0 hero-gradient" />
       <div className="absolute inset-0 grid-bg opacity-30" />
+
+      <HomeNavbar />
 
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2">
@@ -104,8 +107,9 @@ export default function Hero() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             className="relative"
+            rounded-full
           >
-            <div className="glass-card p-6 space-y-6">
+            <div className="glass-card rounded-3xl p-6 space-y-6">
 
               <div className="flex items-center justify-between">
                 <div>
@@ -128,8 +132,7 @@ export default function Hero() {
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-
-                <div className="rounded-xl border p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.05]">
                   <p className="text-sm text-muted-foreground">
                     AI Courses
                   </p>
@@ -139,7 +142,7 @@ export default function Hero() {
                   </h4>
                 </div>
 
-                <div className="rounded-xl border p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.05]">
                   <p className="text-sm text-muted-foreground">
                     PDF Kits
                   </p>
@@ -149,7 +152,7 @@ export default function Hero() {
                   </h4>
                 </div>
 
-                <div className="rounded-xl border p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.05]">
                   <p className="text-sm text-muted-foreground">
                     AI Credits
                   </p>
@@ -159,7 +162,7 @@ export default function Hero() {
                   </h4>
                 </div>
 
-                <div className="rounded-xl border p-4">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.05]">
                   <p className="text-sm text-muted-foreground">
                     Wallet
                   </p>
@@ -187,7 +190,7 @@ export default function Hero() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5 transition-all duration-300 hover:border-primary/30">
                 <p className="font-semibold">
                   Career Bundle
                 </p>
@@ -219,9 +222,9 @@ export default function Hero() {
             return (
               <div
                 key={item.label}
-                className="glass-card hover-lift flex items-center gap-4"
+                className="glass-card hover-lift flex items-center gap-4 rounded-2xl border border-white/10 transition-all duration-300 hover:border-primary/20"
               >
-                <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                <div className="rounded-2xl border border-primary/10 bg-primary/10 p-3 text-primary">
                   <Icon className="h-6 w-6" />
                 </div>
 
