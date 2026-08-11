@@ -6,7 +6,6 @@ import { ArrowRight, BookOpen, Briefcase, Award } from "lucide-react";
 
 import Container from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
-import HomeNavbar from "./home-navbar";
 
 const heroData = {
   user: {
@@ -52,8 +51,6 @@ export default function Hero() {
       {/* Background Effects */}
       <div className="absolute inset-0 hero-gradient" />
       <div className="absolute inset-0 grid-bg opacity-30" />
-
-      <HomeNavbar />
 
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2">
