@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -45,12 +46,18 @@ type NotificationItem = {
 
 type AppHeaderProps = {
   name: string;
+  user: {
+    firstName?: string | null;
+    lastName?: string | null;
+    image?: string | null;
+  };
   notifications: NotificationItem[];
   unreadCount: number;
 };
 
 export function AppHeader({
   name,
+  user,
   notifications: initialNotifications,
   unreadCount: initialUnreadCount,
 }: AppHeaderProps) {
@@ -279,9 +286,26 @@ export function AppHeader({
         {/* User */}
         <div className="flex items-center gap-3">
           <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 font-semibold sm:size-10">
-            {name.charAt(0).toUpperCase()}
+            {user.image ? (
+              <Image
+                src={user.image}
+                alt={
+                  user.firstName
+                    ? `${user.firstName}'s profile`
+                    : "Profile"
+                }
+                width={44}
+                height={44}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-lg font-bold text-cyan-300">
+                {user.firstName
+                  ?.charAt(0)
+                  ?.toUpperCase() || "S"}
+              </span>
+            )}
           </div>
-
           <div className="hidden md:block">
             <p className="font-semibold">
               {name}
