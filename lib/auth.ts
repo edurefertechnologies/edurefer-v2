@@ -54,5 +54,9 @@ export const auth = betterAuth({
         }),
     ],
 
-    trustedOrigins: [process.env.BETTER_AUTH_URL!],
+    trustedOrigins: [
+        process.env.BETTER_AUTH_URL!,
+        "https://edurefertech.com",
+        "https://www.edurefertech.com",
+    ],
 });
