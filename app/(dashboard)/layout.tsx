@@ -58,6 +58,11 @@ export default async function DashboardLayout({
 
           <AppHeader
             name={session.user.firstName ?? "Student"}
+            user={{
+              firstName: session.user.firstName,
+              lastName: session.user.lastName,
+              image: session.user.image,
+            }}
             notifications={notificationData.notifications}
             unreadCount={notificationData.unreadCount}
           />
