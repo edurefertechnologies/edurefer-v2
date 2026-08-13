@@ -10,10 +10,12 @@ declare global {
 
 interface PaymentButtonProps {
   slug: string;
+  type?: "COURSE" | "PDF" | "AI_CREDITS" | "PACKAGE";
 }
 
 export default function PaymentButton({
   slug,
+  type = "COURSE",
 }: PaymentButtonProps) {
   const [loading, setLoading] = useState(false);
 
@@ -21,26 +23,29 @@ export default function PaymentButton({
     try {
       setLoading(true);
 
-      // Razorpay SDK must be loaded
       if (typeof window.Razorpay === "undefined") {
         alert(
           "Payment service is not available. Please refresh the page and try again."
         );
-
         return;
       }
 
-      // Create order on our server
-      const response = await fetch("/api/orders/create", {
-        method: "POST",
+      const endpoint =
+        type === "COURSE"
+          ? "/api/orders/create"
+          : "/api/orders/create-product";
 
+      const body =
+        type === "COURSE"
+          ? { slug }
+          : { slug, type };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-
-        body: JSON.stringify({
-          slug,
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
@@ -50,7 +55,6 @@ export default function PaymentButton({
           data.error ||
           "Unable to create payment order."
         );
-
         return;
       }
 
@@ -60,7 +64,15 @@ export default function PaymentButton({
         currency: data.currency,
 
         name: "Edurefer Technologies LLP",
-        description: "Course Purchase",
+
+        description:
+          type === "COURSE"
+            ? "Course Purchase"
+            : type === "PDF"
+              ? "PDF Purchase"
+              : type === "AI_CREDITS"
+                ? "AI Credits Purchase"
+                : "Package Purchase",
 
         order_id: data.razorpayOrderId,
 
@@ -68,28 +80,27 @@ export default function PaymentButton({
           response: any
         ) {
           try {
-            const verifyResponse = await fetch(
-              "/api/razorpay/verify",
-              {
-                method: "POST",
+            const verifyResponse =
+              await fetch(
+                "/api/razorpay/verify",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+                  body: JSON.stringify({
+                    razorpay_order_id:
+                      response.razorpay_order_id,
 
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                },
+                    razorpay_payment_id:
+                      response.razorpay_payment_id,
 
-                body: JSON.stringify({
-                  razorpay_order_id:
-                    response.razorpay_order_id,
-
-                  razorpay_payment_id:
-                    response.razorpay_payment_id,
-
-                  razorpay_signature:
-                    response.razorpay_signature,
-                }),
-              }
-            );
+                    razorpay_signature:
+                      response.razorpay_signature,
+                  }),
+                }
+              );
 
             const result =
               await verifyResponse.json();
@@ -98,13 +109,21 @@ export default function PaymentButton({
               verifyResponse.ok &&
               result.success
             ) {
-              const courseSlug =
-                result.courseSlug || slug;
+              if (type === "COURSE") {
+                const courseSlug =
+                  result.courseSlug ||
+                  slug;
 
-              window.location.href =
-                `/payment/success?course=${encodeURIComponent(
-                  courseSlug
-                )}`;
+                window.location.href =
+                  `/payment/success?course=${encodeURIComponent(
+                    courseSlug
+                  )}`;
+              } else {
+                window.location.href =
+                  `/payment/success?order=${encodeURIComponent(
+                    result.orderId || data.orderId
+                  )}`;
+              }
 
               return;
             }
@@ -120,7 +139,7 @@ export default function PaymentButton({
             );
 
             alert(
-              "Payment was received, but verification could not be completed. Please contact support if the course does not appear in your account."
+              "Payment was received, but verification could not be completed. Please contact support."
             );
           } finally {
             setLoading(false);
@@ -152,8 +171,8 @@ export default function PaymentButton({
           setLoading(false);
 
           window.location.href =
-            `/payment/failed?course=${encodeURIComponent(
-              slug
+            `/payment/failed?order=${encodeURIComponent(
+              data.orderId
             )}`;
         }
       );

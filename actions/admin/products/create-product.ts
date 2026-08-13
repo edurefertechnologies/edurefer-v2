@@ -42,6 +42,11 @@ export async function createProduct(values: unknown) {
 
         price: data.price,
 
+        credits:
+          data.type === "AI_CREDITS"
+            ? data.credits ?? null
+            : null,
+
         discountPrice:
           data.discountPrice && data.discountPrice > 0
             ? data.discountPrice

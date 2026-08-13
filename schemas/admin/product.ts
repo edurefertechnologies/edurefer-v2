@@ -17,6 +17,13 @@ export const createProductSchema = z.object({
     .number()
     .positive(),
 
+  credits: z.coerce
+    .number()
+    .int()
+    .positive()
+    .nullable()
+    .optional(),
+
   discountPrice: z.coerce
     .number()
     .nullable()

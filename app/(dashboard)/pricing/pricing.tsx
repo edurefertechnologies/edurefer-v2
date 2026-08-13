@@ -162,20 +162,18 @@ export default function Pricing() {
                     category.key
                   )
                 }
-                className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
-                  active
-                    ? "border-primary bg-primary/10 shadow-lg"
-                    : "border-border bg-background hover:border-primary/40 hover:shadow-md"
-                }`}
+                className={`rounded-2xl border p-5 text-left transition-all duration-300 ${active
+                  ? "border-primary bg-primary/10 shadow-lg"
+                  : "border-border bg-background hover:border-primary/40 hover:shadow-md"
+                  }`}
               >
                 <div className="flex items-center gap-4">
 
                   <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${
-                      active
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-primary/10 text-primary"
-                    }`}
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl ${active
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-primary/10 text-primary"
+                      }`}
                   >
                     <Icon className="h-5 w-5" />
                   </div>
@@ -223,13 +221,13 @@ export default function Pricing() {
               const discountPrice =
                 item.discountPrice
                   ? Number(
-                      item.discountPrice
-                    )
+                    item.discountPrice
+                  )
                   : null;
 
               const finalPrice =
                 discountPrice &&
-                discountPrice > 0
+                  discountPrice > 0
                   ? discountPrice
                   : price;
 
@@ -250,11 +248,10 @@ export default function Pricing() {
                   transition={{
                     delay: index * 0.08,
                   }}
-                  className={`relative flex flex-col rounded-3xl border bg-background p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
-                    item.isFeatured
-                      ? "border-primary shadow-xl ring-2 ring-primary/20"
-                      : "border-border"
-                  }`}
+                  className={`relative flex flex-col rounded-3xl border bg-background p-8 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${item.isFeatured
+                    ? "border-primary shadow-xl ring-2 ring-primary/20"
+                    : "border-border"
+                    }`}
                 >
 
                   {/* Featured */}
@@ -300,7 +297,7 @@ export default function Pricing() {
 
                     {discountPrice &&
                       discountPrice <
-                        price && (
+                      price && (
                         <span className="mr-2 text-lg text-muted-foreground line-through">
                           ₹
                           {price.toLocaleString(
@@ -367,7 +364,11 @@ export default function Pricing() {
                   <div className="mt-auto pt-8">
 
                     <Link
-                      href={`/products/${item.slug}`}
+                      href={
+                        activeCategory === "courses"
+                          ? `/courses/${item.slug}`
+                          : `/products/${item.slug}`
+                      }
                       className="block"
                     >
                       <Button

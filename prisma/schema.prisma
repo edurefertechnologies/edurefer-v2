@@ -122,6 +122,7 @@ model Product {
   sku              String?       @unique
   stock            Int?
   type             ProductType
+  credits          Int?
   status           ProductStatus @default(DRAFT)
   price            Decimal       @db.Decimal(10, 2)
   discountPrice    Decimal?      @db.Decimal(10, 2)
