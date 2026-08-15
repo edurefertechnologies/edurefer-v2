@@ -9,29 +9,27 @@ datasource db {
 }
 
 model User {
-  id            String       @id @default(cuid())
-  firstName     String
-  lastName      String?
-  username      String?      @unique
-  email         String       @unique
-  phone         String?      @unique
-  role          UserRole     @default(STUDENT)
-  profile       UserProfile?
-  provider      AuthProvider @default(CREDENTIALS)
-  status        UserStatus   @default(ACTIVE)
-  referralCode  String?      @unique
-  referredById  String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  isDeleted     Boolean      @default(false)
-  lastLogin     DateTime?
-  name          String?
-  emailVerified Boolean      @default(false)
-  image         String?
-  banExpires    DateTime?
-  banReason     String?
-  banned        Boolean      @default(false)
-
+  id              String           @id @default(cuid())
+  firstName       String
+  lastName        String?
+  username        String?          @unique
+  email           String           @unique
+  phone           String?          @unique
+  role            UserRole         @default(STUDENT)
+  provider        AuthProvider     @default(CREDENTIALS)
+  status          UserStatus       @default(ACTIVE)
+  referralCode    String?          @unique
+  referredById    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  isDeleted       Boolean          @default(false)
+  lastLogin       DateTime?
+  name            String?
+  emailVerified   Boolean          @default(false)
+  image           String?
+  banExpires      DateTime?
+  banReason       String?
+  banned          Boolean          @default(false)
   aiConversations AIConversation[]
   aiWallet        AIWallet?
   auditLogs       AuditLog[]
@@ -44,14 +42,13 @@ model User {
   updatedProducts Product[]        @relation("ProductsUpdated")
   referredUsers   Referral?        @relation("ReferralUser")
   referralsMade   Referral[]       @relation("ReferralOwner")
+  profile         UserProfile?
+  resumes         UserResume[]
   wallet          Wallet?
   accounts        Account[]
   sessions        Session[]
-
-  referredBy User?  @relation("UserReferrals", fields: [referredById], references: [id])
-  referrals  User[] @relation("UserReferrals")
-
-  resumes UserResume[]
+  referredBy      User?            @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals       User[]           @relation("UserReferrals")
 
   @@index([email])
   @@index([referralCode])
@@ -59,22 +56,16 @@ model User {
 }
 
 model UserResume {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  title    String @default("My Resume")
-  template String @default("professional")
-
-  data Json
-
-  pdfUrl String?
-
-  isDefault Boolean @default(false)
-
+  id        String   @id @default(cuid())
+  userId    String
+  title     String   @default("My Resume")
+  template  String   @default("professional")
+  data      Json
+  pdfUrl    String?
+  isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, isDefault])
@@ -83,12 +74,8 @@ model UserResume {
 model UserProfile {
   id               String    @id @default(cuid())
   userId           String    @unique
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resumeName       String?
-  resumeSize       Int?
-  resumeUploadedAt DateTime?
   headline         String?
-  bio              String?   @db.Text
+  bio              String?
   dateOfBirth      DateTime?
   gender           Gender?
   address          String?
@@ -111,6 +98,10 @@ model UserProfile {
   resumeUrl        String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  resumeName       String?
+  resumeSize       Int?
+  resumeUploadedAt DateTime?
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -122,7 +113,6 @@ model Product {
   sku              String?       @unique
   stock            Int?
   type             ProductType
-  credits          Int?
   status           ProductStatus @default(DRAFT)
   price            Decimal       @db.Decimal(10, 2)
   discountPrice    Decimal?      @db.Decimal(10, 2)
@@ -135,9 +125,10 @@ model Product {
   updatedById      String?
   isDeleted        Boolean       @default(false)
   currency         Currency      @default(INR)
-  packageItems     PackageItem[]
+  credits          Int?
   course           Course?
   orderItems       OrderItem[]
+  packageItems     PackageItem[]
   createdBy        User?         @relation("ProductsCreated", fields: [createdById], references: [id])
   updatedBy        User?         @relation("ProductsUpdated", fields: [updatedById], references: [id])
 
@@ -172,15 +163,14 @@ model OrderItem {
   id         String   @id @default(cuid())
   orderId    String
   productId  String?
-  packageId  String?
   quantity   Int      @default(1)
   unitPrice  Decimal  @db.Decimal(10, 2)
   totalPrice Decimal  @db.Decimal(10, 2)
   createdAt  DateTime @default(now())
-
-  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product? @relation(fields: [productId], references: [id])
-  package Package? @relation(fields: [packageId], references: [id])
+  packageId  String?
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  package    Package? @relation(fields: [packageId], references: [id])
+  product    Product? @relation(fields: [productId], references: [id])
 
   @@index([orderId])
   @@index([productId])
@@ -307,9 +297,8 @@ model CourseModule {
   title     String
   sortOrder Int
   createdAt DateTime @default(now())
-
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons Lesson[]
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons   Lesson[]
 
   @@unique([courseId, sortOrder])
   @@index([courseId])
@@ -395,11 +384,11 @@ model AIWallet {
   balance          Int             @default(0)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+  dailyFreeCredits Int             @default(5)
+  lastDailyReward  DateTime?
   transactions     AITransaction[]
   usages           AIUsage[]
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  dailyFreeCredits Int             @default(5)
-  lastDailyReward  DateTime?
 }
 
 model AITransaction {
@@ -409,48 +398,36 @@ model AITransaction {
   credits     Int
   description String?
   createdAt   DateTime            @default(now())
-  wallet      AIWallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
   reason      AITransactionReason
+  wallet      AIWallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
 }
 
 model AIConversation {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   userId    String
   service   AIService
   title     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  usages AIUsage[]
-
-  messages AIMessage[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  AIMessage[]
+  usages    AIUsage[]
 }
 
 model AIMessage {
-  id             String @id @default(cuid())
-  conversationId String
-
-  role MessageRole
-
-  content String @db.Text
-
-  creditsUsed Int @default(0)
-
-  promptTokens Int?
-
+  id               String         @id @default(cuid())
+  conversationId   String
+  role             MessageRole
+  content          String
+  creditsUsed      Int            @default(0)
+  promptTokens     Int?
   completionTokens Int?
-
-  totalTokens Int?
-
-  createdAt DateTime @default(now())
-
-  status MessageStatus @default(COMPLETED)
-
-  conversation AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  totalTokens      Int?
+  createdAt        DateTime       @default(now())
+  status           MessageStatus  @default(COMPLETED)
+  conversation     AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
   @@index([conversationId])
 }
@@ -571,9 +548,8 @@ model Package {
   publishedAt      DateTime?
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
-
-  items      PackageItem[]
-  orderItems OrderItem[]
+  orderItems       OrderItem[]
+  items            PackageItem[]
 
   @@index([slug])
   @@index([status])
@@ -585,9 +561,8 @@ model PackageItem {
   productId String
   quantity  Int      @default(1)
   createdAt DateTime @default(now())
-
-  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  package   Package  @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([packageId, productId])
   @@index([packageId])
@@ -624,12 +599,12 @@ enum MessageStatus {
 
 enum AITransactionReason {
   COURSE_PURCHASE
-  PRODUCT_PURCHASE
   REFERRAL
   DAILY_BONUS
   ADMIN_BONUS
   AI_USAGE
   REFUND
+  PRODUCT_PURCHASE
 }
 
 enum ProductType {
@@ -714,13 +689,13 @@ enum CourseLevel {
 }
 
 enum AIService {
-  EDUREFER_ASSISTANT
   RESUME_BUILDER
   INTERVIEW_ASSISTANT
   CAREER_MENTOR
   QUIZ_GENERATOR
   NOTES_GENERATOR
   CODE_ASSISTANT
+  EDUREFER_ASSISTANT
 }
 
 enum MessageRole {
