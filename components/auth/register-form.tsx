@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -27,12 +26,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 
-export default function RegisterForm() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+interface RegisterFormProps {
+  referralCode?: string | null;
+}
 
-  const referralCode =
-    searchParams.get("ref");
+export default function RegisterForm({
+  referralCode,
+}: RegisterFormProps) {
+  const router = useRouter();
 
   const [loading, setLoading] = useState(false);
 
