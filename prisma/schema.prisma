@@ -624,6 +624,7 @@ enum MessageStatus {
 
 enum AITransactionReason {
   COURSE_PURCHASE
+  PRODUCT_PURCHASE
   REFERRAL
   DAILY_BONUS
   ADMIN_BONUS

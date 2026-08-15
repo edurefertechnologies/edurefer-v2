@@ -29,6 +29,19 @@ export async function completePayment({
                   course: true,
                 },
               },
+              package: {
+                include: {
+                  items: {
+                    include: {
+                      product: {
+                        include: {
+                          course: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -45,11 +58,15 @@ export async function completePayment({
     return payment;
   }
 
-  const course = payment.order.items[0]?.product?.course;
+  const orderItem = payment.order.items[0];
 
-  if (!course) {
-    throw new Error("Course not found.");
+  if (!orderItem) {
+    throw new Error("Order item not found.");
   }
+
+  const product = orderItem.product;
+  const course = product?.course;
+  const packageData = orderItem.package;
 
   return prisma.$transaction(async (tx) => {
     const updatedPayment = await tx.payment.update({
@@ -73,32 +90,172 @@ export async function completePayment({
       },
     });
 
-    const existingEnrollment =
-      await tx.enrollment.findUnique({
-        where: {
-          userId_courseId: {
+    if (course) {
+      const existingEnrollment =
+        await tx.enrollment.findUnique({
+          where: {
+            userId_courseId: {
+              userId: payment.order.userId,
+              courseId: course.id,
+            },
+          },
+        });
+
+      if (!existingEnrollment) {
+        await tx.enrollment.create({
+          data: {
             userId: payment.order.userId,
             courseId: course.id,
+            orderId: payment.order.id,
+          },
+        });
+
+        await createNotificationTx(tx, {
+          userId: payment.order.userId,
+          title: "Course Enrollment Successful",
+          message: `You have successfully enrolled in ${course.title}.`,
+          type: NotificationType.SUCCESS,
+          actionUrl: `/learn/${course.slug}`,
+        });
+      }
+    }
+
+    if (
+      product?.type === "AI_CREDITS" &&
+      product.credits &&
+      product.credits > 0
+    ) {
+      const wallet = await tx.aIWallet.upsert({
+        where: {
+          userId: payment.order.userId,
+        },
+
+        create: {
+          userId: payment.order.userId,
+          balance: product.credits,
+        },
+
+        update: {
+          balance: {
+            increment: product.credits,
           },
         },
       });
 
-    if (!existingEnrollment) {
-      await tx.enrollment.create({
+      await tx.aITransaction.create({
         data: {
-          userId: payment.order.userId,
-          courseId: course.id,
-          orderId: payment.order.id,
+          walletId: wallet.id,
+          type: "CREDIT",
+          credits: product.credits,
+          reason: "PRODUCT_PURCHASE",
+          description: `AI credits purchased with order ${payment.order.orderNumber}`,
         },
       });
 
       await createNotificationTx(tx, {
         userId: payment.order.userId,
-        title: "Course Enrollment Successful",
-        message: `You have successfully enrolled in ${course.title}.`,
+        title: "AI Credits Added",
+        message: `${product.credits} AI credits have been added to your AI wallet.`,
         type: NotificationType.SUCCESS,
-        actionUrl: `/learn/${course.slug}`,
+        actionUrl: "/ai",
       });
+    }
+
+    if (packageData) {
+      for (const packageItem of packageData.items) {
+        const packageProduct =
+          packageItem.product;
+
+        // AI Credits included in package
+        if (
+          packageProduct.type === "AI_CREDITS" &&
+          packageProduct.credits &&
+          packageProduct.credits > 0
+        ) {
+          const totalCredits =
+            packageProduct.credits *
+            packageItem.quantity;
+
+          const wallet =
+            await tx.aIWallet.upsert({
+              where: {
+                userId:
+                  payment.order.userId,
+              },
+
+              create: {
+                userId:
+                  payment.order.userId,
+                balance: totalCredits,
+              },
+
+              update: {
+                balance: {
+                  increment: totalCredits,
+                },
+              },
+            });
+
+          await tx.aITransaction.create({
+            data: {
+              walletId: wallet.id,
+              type: "CREDIT",
+              credits: totalCredits,
+              reason: "PRODUCT_PURCHASE",
+              description:
+                `AI credits included in package ${packageData.name} - order ${payment.order.orderNumber}`,
+            },
+          });
+        }
+
+        // Course included in package
+        if (packageProduct.course) {
+          const existingEnrollment =
+            await tx.enrollment.findUnique({
+              where: {
+                userId_courseId: {
+                  userId:
+                    payment.order.userId,
+                  courseId:
+                    packageProduct.course.id,
+                },
+              },
+            });
+
+          if (!existingEnrollment) {
+            await tx.enrollment.create({
+              data: {
+                userId:
+                  payment.order.userId,
+                courseId:
+                  packageProduct.course.id,
+                orderId:
+                  payment.order.id,
+              },
+            });
+
+            await createNotificationTx(
+              tx,
+              {
+                userId:
+                  payment.order.userId,
+
+                title:
+                  "Course Added From Package",
+
+                message:
+                  `${packageProduct.course.title} has been added to your courses.`,
+
+                type:
+                  NotificationType.SUCCESS,
+
+                actionUrl:
+                  `/learn/${packageProduct.course.slug}`,
+              }
+            );
+          }
+        }
+      }
     }
 
     const referral = await tx.referral.findUnique({
