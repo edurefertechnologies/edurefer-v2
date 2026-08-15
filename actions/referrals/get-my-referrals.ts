@@ -23,6 +23,50 @@ export async function getMyReferrals() {
     return null;
   }
 
+  const qualifyingOrder =
+    await prisma.order.findFirst({
+      where: {
+        userId: session.user.id,
+        status: "PAID",
+
+        items: {
+          some: {
+            OR: [
+              {
+                productId: {
+                  not: null,
+                },
+              },
+              {
+                packageId: {
+                  not: null,
+                },
+              },
+            ],
+          },
+        },
+      },
+
+      select: {
+        id: true,
+      },
+    });
+
+  if (!qualifyingOrder) {
+    return {
+      eligible: false,
+      referralCode: user.referralCode,
+      referrals: [],
+      transactions: [],
+      stats: {
+        totalReferrals: 0,
+        successfulReferrals: 0,
+        pendingReferrals: 0,
+        totalEarnings: 0,
+      },
+    };
+  }
+
   const referrals = await prisma.referral.findMany({
     where: {
       referrerId: session.user.id,
@@ -74,6 +118,7 @@ export async function getMyReferrals() {
   );
 
   return {
+    eligible: true,
     referralCode: user.referralCode,
     referrals,
     transactions: transactions.map(
@@ -86,13 +131,11 @@ export async function getMyReferrals() {
       totalReferrals: referrals.length,
       successfulReferrals:
         referrals.filter(
-          (referral) =>
-            referral.isRewarded
+          (referral) => referral.isRewarded
         ).length,
       pendingReferrals:
         referrals.filter(
-          (referral) =>
-            !referral.isRewarded
+          (referral) => !referral.isRewarded
         ).length,
       totalEarnings,
     },

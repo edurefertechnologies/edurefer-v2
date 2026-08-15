@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
@@ -28,6 +29,10 @@ import { PasswordInput } from "@/components/ui/password-input";
 
 export default function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const referralCode =
+    searchParams.get("ref");
 
   const [loading, setLoading] = useState(false);
 
@@ -56,6 +61,25 @@ export default function RegisterForm() {
       if (error) {
         toast.error(error.message);
         return;
+      }
+
+      if (referralCode) {
+        try {
+          await fetch("/api/referrals/attach", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              referralCode,
+            }),
+          });
+        } catch (error) {
+          console.error(
+            "REFERRAL_ATTACH_ERROR:",
+            error
+          );
+        }
       }
 
       toast.success("Account created successfully!");

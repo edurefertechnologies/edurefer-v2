@@ -24,10 +24,13 @@ type AppSidebarProps = {
     email: string;
     image?: string | null;
   };
+
+  canRefer: boolean;
 };
 
 export function AppSidebar({
   user,
+  canRefer,
 }: AppSidebarProps) {
   const pathname = usePathname();
 
@@ -220,24 +223,31 @@ export function AppSidebar({
 
           <SidebarMenu>
 
-            {navItems.slice(5).map((item) => {
+            {navItems
+              .slice(5)
+              .filter(
+                (item) =>
+                  item.href !== "/referrals" ||
+                  canRefer
+              )
+              .map((item) => {
 
-              const active =
-                pathname === item.href;
+                const active =
+                  pathname === item.href;
 
-              return (
+                return (
 
-                <SidebarMenuItem
-                  key={item.href}
-                  className="mb-1"
-                >
+                  <SidebarMenuItem
+                    key={item.href}
+                    className="mb-1"
+                  >
 
-                  <SidebarMenuButton
-                    isActive={active}
-                    render={
-                      <Link
-                        href={item.href}
-                        className={`
+                    <SidebarMenuButton
+                      isActive={active}
+                      render={
+                        <Link
+                          href={item.href}
+                          className={`
                   group
                   relative
                   flex
@@ -250,16 +260,16 @@ export function AppSidebar({
                   duration-300
 
                   ${active
-                            ? "bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-emerald-500/20 border border-cyan-400/20 shadow-lg shadow-cyan-500/20"
-                            : "hover:bg-white/5"
-                          }
+                              ? "bg-gradient-to-r from-cyan-500/20 via-blue-500/15 to-emerald-500/20 border border-cyan-400/20 shadow-lg shadow-cyan-500/20"
+                              : "hover:bg-white/5"
+                            }
                   `}
-                      >
+                        >
 
-                        {active && (
+                          {active && (
 
-                          <span
-                            className="
+                            <span
+                              className="
                       absolute
                       left-0
                       top-2
@@ -270,44 +280,44 @@ export function AppSidebar({
                       from-cyan-400
                       to-emerald-400
                       "
-                          />
+                            />
 
-                        )}
+                          )}
 
-                        <item.icon
-                          className={`
+                          <item.icon
+                            className={`
                     h-5
                     w-5
 
                     ${active
-                              ? "text-cyan-300"
-                              : "text-slate-400 group-hover:text-white"
-                            }
+                                ? "text-cyan-300"
+                                : "text-slate-400 group-hover:text-white"
+                              }
                     `}
-                        />
+                          />
 
-                        <span
-                          className={`
+                          <span
+                            className={`
                     font-medium
 
                     ${active
-                              ? "text-white"
-                              : "text-slate-300 group-hover:text-white"
-                            }
+                                ? "text-white"
+                                : "text-slate-300 group-hover:text-white"
+                              }
                     `}
-                        >
-                          {item.title}
-                        </span>
+                          >
+                            {item.title}
+                          </span>
 
-                      </Link>
-                    }
-                  />
+                        </Link>
+                      }
+                    />
 
-                </SidebarMenuItem>
+                  </SidebarMenuItem>
 
-              );
+                );
 
-            })}
+              })}
 
           </SidebarMenu>
 

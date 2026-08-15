@@ -131,6 +131,7 @@ model Product {
   packageItems     PackageItem[]
   createdBy        User?         @relation("ProductsCreated", fields: [createdById], references: [id])
   updatedBy        User?         @relation("ProductsUpdated", fields: [updatedById], references: [id])
+  fileUrl          String?
 
   @@index([slug])
   @@index([type])
