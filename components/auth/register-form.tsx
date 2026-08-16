@@ -85,7 +85,9 @@ export default function RegisterForm({
 
       toast.success("Account created successfully!");
 
-      router.push("/dashboard");
+      router.push(
+        `/verify-email?email=${encodeURIComponent(values.email)}`
+      );
       router.refresh();
     } catch {
       toast.error("Something went wrong.");

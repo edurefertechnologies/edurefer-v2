@@ -3,7 +3,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
 
 import { prisma } from "@/lib/prisma";
-import { sendPasswordResetEmail } from "@/lib/email";
+import {
+    sendPasswordResetEmail,
+    sendVerificationEmail,
+} from "@/lib/email";
 
 export const auth = betterAuth({
     database: prismaAdapter(prisma, {
@@ -27,6 +30,23 @@ export const auth = betterAuth({
                 resetUrl: url,
             });
         },
+    },
+
+    emailVerification: {
+        sendVerificationEmail: async ({
+            user,
+            url,
+        }) => {
+            await sendVerificationEmail({
+                email: user.email,
+                name: user.name ?? "Student",
+                verificationUrl: url,
+            });
+        },
+
+        sendOnSignUp: true,
+
+        autoSignInAfterVerification: true,
     },
 
     user: {

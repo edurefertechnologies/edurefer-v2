@@ -1,333 +1,607 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
-    User,
-    GraduationCap,
-    BriefcaseBusiness,
-    MapPin,
-    Link2,
-    Mail,
-    Save,
+    Bell,
+    BookOpen,
     CheckCircle2,
-    AlertCircle,
+    CreditCard,
+    Globe,
+    KeyRound,
+    Lock,
+    Mail,
+    Moon,
+    Palette,
+    Save,
+    ShieldCheck,
+    Sun,
+    User,
+    AlertTriangle,
 } from "lucide-react";
 
-import { updateProfile } from "@/actions/profile/update-profile";
-import type { ProfileForm } from "@/components/profile/types";
+import {
+    updateSettings,
+    type UpdateSettingsInput,
+} from "@/actions/settings/update-settings";
+import ChangePassword from "./change-password";
+import EmailVerification from "./email-verification";
 
-interface SettingsProfile {
-    id: string;
-    firstName: string;
-    lastName: string;
+interface SettingsData {
     email: string;
     phone: string;
-    image: string | null;
     emailVerified: boolean;
 
-    profile: {
-        headline: string;
-        bio: string;
-        address: string;
-        city: string;
-        state: string;
-        country: string;
-        pincode: string;
+    courseNotifications: boolean;
+    referralNotifications: boolean;
+    orderNotifications: boolean;
+    systemNotifications: boolean;
 
-        college: string;
-        university: string;
-        degree: string;
-        branch: string;
-        passingYear?: number;
-
-        currentCompany: string;
-        designation: string;
-        experience?: number;
-
-        linkedin: string;
-        github: string;
-        portfolio: string;
-        website: string;
-    } | null;
+    theme: string;
+    language: string;
 }
 
 interface Props {
-    profile: SettingsProfile;
+    settings: SettingsData;
 }
 
-type Section = {
-    id: string;
-    title: string;
-    description: string;
-    icon: React.ElementType;
-};
-
-const sections: Section[] = [
-    {
-        id: "personal",
-        title: "Personal Information",
-        description: "Manage your basic account information.",
-        icon: User,
-    },
-    {
-        id: "education",
-        title: "Education",
-        description: "Manage your academic information.",
-        icon: GraduationCap,
-    },
-    {
-        id: "experience",
-        title: "Experience",
-        description: "Manage your professional experience.",
-        icon: BriefcaseBusiness,
-    },
-    {
-        id: "address",
-        title: "Address",
-        description: "Manage your location details.",
-        icon: MapPin,
-    },
-    {
-        id: "social",
-        title: "Social Links",
-        description: "Manage your professional links.",
-        icon: Link2,
-    },
-];
-
 export default function SettingsPageClient({
-    profile,
+    settings,
 }: Props) {
-    const [activeSection, setActiveSection] =
-        useState("personal");
+    const [form, setForm] =
+        useState<UpdateSettingsInput>({
+            courseNotifications:
+                settings.courseNotifications,
 
-    const [form, setForm] = useState<ProfileForm>({
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-        phone: profile.phone,
+            referralNotifications:
+                settings.referralNotifications,
 
-        headline: profile.profile?.headline ?? "",
-        bio: profile.profile?.bio ?? "",
+            orderNotifications:
+                settings.orderNotifications,
 
-        address: profile.profile?.address ?? "",
-        city: profile.profile?.city ?? "",
-        state: profile.profile?.state ?? "",
-        country: profile.profile?.country ?? "",
-        pincode: profile.profile?.pincode ?? "",
+            systemNotifications:
+                settings.systemNotifications,
 
-        college: profile.profile?.college ?? "",
-        university: profile.profile?.university ?? "",
-        degree: profile.profile?.degree ?? "",
-        branch: profile.profile?.branch ?? "",
-        passingYear:
-            profile.profile?.passingYear?.toString() ?? "",
+            theme:
+                settings.theme === "light" ||
+                    settings.theme === "dark"
+                    ? settings.theme
+                    : "system",
 
-        currentCompany:
-            profile.profile?.currentCompany ?? "",
-        designation:
-            profile.profile?.designation ?? "",
-        experience:
-            profile.profile?.experience?.toString() ?? "",
-
-        linkedin:
-            profile.profile?.linkedin ?? "",
-        github:
-            profile.profile?.github ?? "",
-        portfolio:
-            profile.profile?.portfolio ?? "",
-        website:
-            profile.profile?.website ?? "",
-    });
+            language:
+                settings.language === "hi" ||
+                    settings.language === "mr"
+                    ? settings.language
+                    : "en",
+        });
 
     const [saving, setSaving] = useState(false);
-    const [success, setSuccess] = useState(false);
+    const [saved, setSaved] = useState(false);
     const [error, setError] = useState("");
 
-    function updateField(
-        field: keyof ProfileForm,
-        value: string
+    /*
+     * Keep the current application theme in sync
+     * with the user's saved preference.
+     */
+    useEffect(() => {
+        const root =
+            document.documentElement;
+
+        if (form.theme === "light") {
+            root.classList.remove("dark");
+            return;
+        }
+
+        if (form.theme === "dark") {
+            root.classList.add("dark");
+            return;
+        }
+
+        const prefersDark =
+            window.matchMedia(
+                "(prefers-color-scheme: dark)"
+            ).matches;
+
+        root.classList.toggle(
+            "dark",
+            prefersDark
+        );
+    }, [form.theme]);
+
+    function updateField<
+        K extends keyof UpdateSettingsInput
+    >(
+        field: K,
+        value: UpdateSettingsInput[K]
     ) {
         setForm((current) => ({
             ...current,
             [field]: value,
         }));
 
-        setSuccess(false);
+        setSaved(false);
         setError("");
     }
 
     async function handleSave() {
         try {
             setSaving(true);
-            setSuccess(false);
+            setSaved(false);
             setError("");
 
-            await updateProfile({
-                firstName: form.firstName.trim(),
-                lastName: form.lastName.trim() || undefined,
-                phone: form.phone.trim() || undefined,
+            await updateSettings(form);
 
-                headline: form.headline.trim() || undefined,
-                bio: form.bio.trim() || undefined,
-
-                address: form.address.trim() || undefined,
-                city: form.city.trim() || undefined,
-                state: form.state.trim() || undefined,
-                country: form.country.trim() || undefined,
-                pincode: form.pincode.trim() || undefined,
-
-                college: form.college.trim() || undefined,
-                university:
-                    form.university.trim() || undefined,
-                degree: form.degree.trim() || undefined,
-                branch: form.branch.trim() || undefined,
-
-                passingYear: form.passingYear
-                    ? Number(form.passingYear)
-                    : undefined,
-
-                currentCompany:
-                    form.currentCompany.trim() || undefined,
-                designation:
-                    form.designation.trim() || undefined,
-
-                experience: form.experience
-                    ? Number(form.experience)
-                    : undefined,
-
-                linkedin:
-                    form.linkedin.trim() || undefined,
-                github:
-                    form.github.trim() || undefined,
-                portfolio:
-                    form.portfolio.trim() || undefined,
-                website:
-                    form.website.trim() || undefined,
-            });
-
-            setSuccess(true);
-        } catch (err) {
+            setSaved(true);
+        } catch (error) {
             console.error(
                 "SETTINGS_UPDATE_ERROR:",
-                err
+                error
             );
 
             setError(
-                err instanceof Error
-                    ? err.message
-                    : "Unable to update your profile."
+                error instanceof Error
+                    ? error.message
+                    : "Unable to save settings."
             );
         } finally {
             setSaving(false);
         }
     }
 
-    const inputClass =
-        "w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50 focus:bg-white/[0.06]";
-
-    const labelClass =
-        "mb-2 block text-sm font-medium text-slate-300";
-
     return (
-        <div className="space-y-6">
+        <div className="mx-auto w-full max-w-6xl space-y-6">
 
             {/* Header */}
 
             <div>
-                <h1 className="text-3xl font-bold text-white">
-                    Settings
-                </h1>
+                <div className="flex items-center gap-3">
+                    <div className="rounded-xl bg-cyan-500/10 p-3">
+                        <Palette className="h-6 w-6 text-cyan-300" />
+                    </div>
 
-                <p className="mt-2 text-sm text-slate-400">
-                    Manage your Edurefer account and profile
-                    information.
-                </p>
-            </div>
+                    <div>
+                        <h1 className="text-3xl font-bold text-white">
+                            Settings
+                        </h1>
 
-            <div className="grid gap-6 lg:grid-cols-[250px_1fr]">
-
-                {/* Sidebar */}
-
-                <aside className="h-fit rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-
-                    <div className="mb-3 px-3 py-2">
-                        <p className="text-xs font-bold uppercase tracking-wider text-cyan-300/70">
-                            Account Settings
+                        <p className="mt-1 text-sm text-slate-400">
+                            Manage your account, security and
+                            application preferences.
                         </p>
                     </div>
+                </div>
+            </div>
 
-                    <div className="space-y-1">
+            {/* Main Grid */}
 
-                        {sections.map((section) => {
-                            const Icon = section.icon;
-                            const active =
-                                activeSection === section.id;
+            <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
 
-                            return (
-                                <button
-                                    key={section.id}
-                                    type="button"
-                                    onClick={() =>
-                                        setActiveSection(section.id)
-                                    }
-                                    className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition ${active
-                                            ? "border border-cyan-400/20 bg-cyan-400/10 text-white"
-                                            : "text-slate-400 hover:bg-white/5 hover:text-white"
-                                        }`}
-                                >
-                                    <Icon
-                                        className={`h-5 w-5 ${active
-                                                ? "text-cyan-300"
-                                                : "text-slate-500"
-                                            }`}
-                                    />
+                {/* Main Settings */}
 
-                                    <div className="min-w-0">
-                                        <p className="text-sm font-medium">
-                                            {section.title}
-                                        </p>
+                <div className="space-y-6">
 
-                                        <p className="hidden text-xs text-slate-500 xl:block">
-                                            {section.description}
-                                        </p>
+                    {/* Account */}
+
+                    <SettingsCard
+                        icon={User}
+                        title="Account"
+                        description="Manage your basic account information."
+                    >
+                        <div className="space-y-5">
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-slate-300">
+                                    Email Address
+                                </label>
+
+                                <div className="flex items-center gap-3">
+                                    <div className="relative flex-1">
+                                        <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+
+                                        <input
+                                            value={settings.email}
+                                            disabled
+                                            className={inputClass(
+                                                true
+                                            )}
+                                        />
                                     </div>
-                                </button>
-                            );
-                        })}
+
+                                    <EmailVerification
+                                        email={settings.email}
+                                        emailVerified={settings.emailVerified}
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="mb-2 block text-sm font-medium text-slate-300">
+                                    Phone Number
+                                </label>
+
+                                <input
+                                    value={settings.phone}
+                                    disabled
+                                    className={inputClass(true)}
+                                />
+
+                                <p className="mt-2 text-xs text-slate-500">
+                                    Phone number can be updated from
+                                    your Profile.
+                                </p>
+                            </div>
+
+                        </div>
+                    </SettingsCard>
+
+                    {/* Security */}
+
+                    <SettingsCard
+                        icon={ShieldCheck}
+                        title="Security"
+                        description="Keep your Edurefer account secure."
+                    >
+                        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+
+                            <div className="flex items-start gap-4">
+
+                                <div className="rounded-xl bg-blue-500/10 p-3">
+                                    <KeyRound className="h-5 w-5 text-blue-300" />
+                                </div>
+
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-white">
+                                        Change Password
+                                    </h3>
+
+                                    <p className="mt-1 text-sm text-slate-400">
+                                        Update your password to keep your
+                                        account protected.
+                                    </p>
+                                </div>
+
+                                <ChangePassword />
+
+                            </div>
+
+                        </div>
+                    </SettingsCard>
+
+                    {/* Notifications */}
+
+                    <SettingsCard
+                        icon={Bell}
+                        title="Notifications"
+                        description="Choose which notifications you want to receive."
+                    >
+                        <div className="divide-y divide-white/10">
+
+                            <ToggleRow
+                                icon={BookOpen}
+                                title="Course Updates"
+                                description="Enrollment, learning and course related updates."
+                                checked={
+                                    form.courseNotifications
+                                }
+                                onChange={(value) =>
+                                    updateField(
+                                        "courseNotifications",
+                                        value
+                                    )
+                                }
+                            />
+
+                            <ToggleRow
+                                icon={User}
+                                title="Referral Rewards"
+                                description="Get notified when referral rewards are credited."
+                                checked={
+                                    form.referralNotifications
+                                }
+                                onChange={(value) =>
+                                    updateField(
+                                        "referralNotifications",
+                                        value
+                                    )
+                                }
+                            />
+
+                            <ToggleRow
+                                icon={CreditCard}
+                                title="Orders & Payments"
+                                description="Payment, order and purchase related notifications."
+                                checked={
+                                    form.orderNotifications
+                                }
+                                onChange={(value) =>
+                                    updateField(
+                                        "orderNotifications",
+                                        value
+                                    )
+                                }
+                            />
+
+                            <ToggleRow
+                                icon={Bell}
+                                title="System Notifications"
+                                description="Important announcements and system messages."
+                                checked={
+                                    form.systemNotifications
+                                }
+                                onChange={(value) =>
+                                    updateField(
+                                        "systemNotifications",
+                                        value
+                                    )
+                                }
+                            />
+
+                        </div>
+                    </SettingsCard>
+
+                    {/* Appearance */}
+
+                    <SettingsCard
+                        icon={Palette}
+                        title="Appearance"
+                        description="Choose how Edurefer looks on your device."
+                    >
+                        <div className="grid gap-3 sm:grid-cols-3">
+
+                            <ThemeButton
+                                active={
+                                    form.theme === "system"
+                                }
+                                icon={MonitorIcon}
+                                title="System"
+                                description="Use device setting"
+                                onClick={() =>
+                                    updateField(
+                                        "theme",
+                                        "system"
+                                    )
+                                }
+                            />
+
+                            <ThemeButton
+                                active={
+                                    form.theme === "light"
+                                }
+                                icon={Sun}
+                                title="Light"
+                                description="Light appearance"
+                                onClick={() =>
+                                    updateField(
+                                        "theme",
+                                        "light"
+                                    )
+                                }
+                            />
+
+                            <ThemeButton
+                                active={
+                                    form.theme === "dark"
+                                }
+                                icon={Moon}
+                                title="Dark"
+                                description="Dark appearance"
+                                onClick={() =>
+                                    updateField(
+                                        "theme",
+                                        "dark"
+                                    )
+                                }
+                            />
+
+                        </div>
+                    </SettingsCard>
+
+                    {/* Language */}
+
+                    <SettingsCard
+                        icon={Globe}
+                        title="Language"
+                        description="Choose your preferred application language."
+                    >
+                        <div className="grid gap-3 sm:grid-cols-3">
+
+                            <LanguageButton
+                                active={
+                                    form.language === "en"
+                                }
+                                title="English"
+                                subtitle="English"
+                                onClick={() =>
+                                    updateField(
+                                        "language",
+                                        "en"
+                                    )
+                                }
+                            />
+
+                            <LanguageButton
+                                active={
+                                    form.language === "hi"
+                                }
+                                title="हिन्दी"
+                                subtitle="Hindi"
+                                onClick={() =>
+                                    updateField(
+                                        "language",
+                                        "hi"
+                                    )
+                                }
+                            />
+
+                            <LanguageButton
+                                active={
+                                    form.language === "mr"
+                                }
+                                title="मराठी"
+                                subtitle="Marathi"
+                                onClick={() =>
+                                    updateField(
+                                        "language",
+                                        "mr"
+                                    )
+                                }
+                            />
+
+                        </div>
+
+                        <p className="mt-4 text-xs text-slate-500">
+                            Language preference is saved to your
+                            account. Full application translation
+                            will be enabled when the corresponding
+                            language content is available.
+                        </p>
+                    </SettingsCard>
+
+                    {/* Save */}
+
+                    <div className="sticky bottom-4 z-20 rounded-2xl border border-white/10 bg-[#07111F]/95 p-4 shadow-2xl backdrop-blur-xl">
+
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+                            <div>
+                                {saved && (
+                                    <p className="flex items-center gap-2 text-sm text-emerald-400">
+                                        <CheckCircle2 className="h-4 w-4" />
+                                        Settings saved successfully.
+                                    </p>
+                                )}
+
+                                {error && (
+                                    <p className="text-sm text-red-400">
+                                        {error}
+                                    </p>
+                                )}
+
+                                {!saved && !error && (
+                                    <p className="text-sm text-slate-500">
+                                        Save your changes when you're done.
+                                    </p>
+                                )}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold text-white transition hover:from-cyan-400 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                                <Save className="h-4 w-4" />
+
+                                {saving
+                                    ? "Saving..."
+                                    : "Save Changes"}
+                            </button>
+
+                        </div>
+                    </div>
+
+                    {/* Danger Zone */}
+
+                    <SettingsCard
+                        icon={AlertTriangle}
+                        title="Danger Zone"
+                        description="Actions here can permanently affect your account."
+                        danger
+                    >
+                        <div className="flex flex-col gap-4 rounded-xl border border-red-500/20 bg-red-500/5 p-5 sm:flex-row sm:items-center sm:justify-between">
+
+                            <div>
+                                <h3 className="font-semibold text-red-300">
+                                    Delete Account
+                                </h3>
+
+                                <p className="mt-1 text-sm text-slate-400">
+                                    Permanently delete your Edurefer
+                                    account and associated data.
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                disabled
+                                className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-300 opacity-60"
+                            >
+                                Delete Account
+                            </button>
+
+                        </div>
+                    </SettingsCard>
+
+                </div>
+
+                {/* Right Info */}
+
+                <aside className="h-fit space-y-6 lg:sticky lg:top-6">
+
+                    <div className="rounded-2xl border border-cyan-400/10 bg-gradient-to-br from-cyan-500/10 via-blue-500/5 to-transparent p-6">
+
+                        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-400/10">
+                            <Lock className="h-6 w-6 text-cyan-300" />
+                        </div>
+
+                        <h3 className="font-bold text-white">
+                            Your Privacy Matters
+                        </h3>
+
+                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                            Your account preferences are linked
+                            to your Edurefer account and are saved
+                            securely.
+                        </p>
 
                     </div>
 
-                    {/* Email status */}
+                    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
 
-                    <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                        <h3 className="font-semibold text-white">
+                            Account Information
+                        </h3>
 
-                        <div className="flex items-center gap-2">
-                            <Mail className="h-4 w-4 text-slate-400" />
+                        <div className="mt-4 space-y-4 text-sm">
 
-                            <span className="text-xs font-medium text-slate-300">
-                                Email Status
-                            </span>
-                        </div>
+                            <InfoRow
+                                label="Email"
+                                value={settings.email}
+                            />
 
-                        <div className="mt-3 flex items-center gap-2">
+                            <InfoRow
+                                label="Email Status"
+                                value={
+                                    settings.emailVerified
+                                        ? "Verified"
+                                        : "Not Verified"
+                                }
+                                valueClass={
+                                    settings.emailVerified
+                                        ? "text-emerald-400"
+                                        : "text-amber-400"
+                                }
+                            />
 
-                            {profile.emailVerified ? (
-                                <>
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                            <InfoRow
+                                label="Theme"
+                                value={
+                                    form.theme
+                                        .charAt(0)
+                                        .toUpperCase() +
+                                    form.theme.slice(1)
+                                }
+                            />
 
-                                    <span className="text-xs text-emerald-400">
-                                        Verified
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <AlertCircle className="h-4 w-4 text-amber-400" />
-
-                                    <span className="text-xs text-amber-400">
-                                        Not Verified
-                                    </span>
-                                </>
-                            )}
+                            <InfoRow
+                                label="Language"
+                                value={
+                                    form.language === "en"
+                                        ? "English"
+                                        : form.language === "hi"
+                                            ? "Hindi"
+                                            : "Marathi"
+                                }
+                            />
 
                         </div>
 
@@ -335,456 +609,51 @@ export default function SettingsPageClient({
 
                 </aside>
 
-                {/* Content */}
-
-                <section className="rounded-2xl border border-white/10 bg-white/[0.03] p-6">
-
-                    {/* Personal */}
-
-                    {activeSection === "personal" && (
-                        <SettingsSection
-                            icon={User}
-                            title="Personal Information"
-                            description="Update your basic profile information."
-                        >
-                            <div className="grid gap-5 md:grid-cols-2">
-
-                                <Field
-                                    label="First Name"
-                                    value={form.firstName}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "firstName",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                    required
-                                />
-
-                                <Field
-                                    label="Last Name"
-                                    value={form.lastName}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "lastName",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Email"
-                                    value={profile.email}
-                                    disabled
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Phone"
-                                    value={form.phone}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "phone",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <div className="md:col-span-2">
-                                    <Field
-                                        label="Headline"
-                                        value={form.headline}
-                                        onChange={(value) =>
-                                            updateField(
-                                                "headline",
-                                                value
-                                            )
-                                        }
-                                        placeholder="Software Developer | AI Enthusiast"
-                                        className={inputClass}
-                                        labelClass={labelClass}
-                                    />
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className={labelClass}>
-                                        Bio
-                                    </label>
-
-                                    <textarea
-                                        rows={5}
-                                        value={form.bio}
-                                        onChange={(e) =>
-                                            updateField(
-                                                "bio",
-                                                e.target.value
-                                            )
-                                        }
-                                        placeholder="Tell us something about yourself..."
-                                        className={inputClass}
-                                    />
-                                </div>
-
-                            </div>
-                        </SettingsSection>
-                    )}
-
-                    {/* Education */}
-
-                    {activeSection === "education" && (
-                        <SettingsSection
-                            icon={GraduationCap}
-                            title="Education"
-                            description="Keep your academic information up to date."
-                        >
-                            <div className="grid gap-5 md:grid-cols-2">
-
-                                <Field
-                                    label="College"
-                                    value={form.college}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "college",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="University"
-                                    value={form.university}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "university",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Degree"
-                                    value={form.degree}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "degree",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Branch"
-                                    value={form.branch}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "branch",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Passing Year"
-                                    type="number"
-                                    value={form.passingYear}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "passingYear",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                            </div>
-                        </SettingsSection>
-                    )}
-
-                    {/* Experience */}
-
-                    {activeSection === "experience" && (
-                        <SettingsSection
-                            icon={BriefcaseBusiness}
-                            title="Experience"
-                            description="Manage your current professional information."
-                        >
-                            <div className="grid gap-5 md:grid-cols-2">
-
-                                <Field
-                                    label="Current Company"
-                                    value={form.currentCompany}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "currentCompany",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Designation"
-                                    value={form.designation}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "designation",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Experience (Years)"
-                                    type="number"
-                                    value={form.experience}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "experience",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                            </div>
-                        </SettingsSection>
-                    )}
-
-                    {/* Address */}
-
-                    {activeSection === "address" && (
-                        <SettingsSection
-                            icon={MapPin}
-                            title="Address"
-                            description="Manage your current location details."
-                        >
-                            <div className="grid gap-5 md:grid-cols-2">
-
-                                <div className="md:col-span-2">
-                                    <Field
-                                        label="Address"
-                                        value={form.address}
-                                        onChange={(value) =>
-                                            updateField(
-                                                "address",
-                                                value
-                                            )
-                                        }
-                                        className={inputClass}
-                                        labelClass={labelClass}
-                                    />
-                                </div>
-
-                                <Field
-                                    label="City"
-                                    value={form.city}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "city",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="State"
-                                    value={form.state}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "state",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Country"
-                                    value={form.country}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "country",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Pincode"
-                                    value={form.pincode}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "pincode",
-                                            value
-                                        )
-                                    }
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                            </div>
-                        </SettingsSection>
-                    )}
-
-                    {/* Social */}
-
-                    {activeSection === "social" && (
-                        <SettingsSection
-                            icon={Link2}
-                            title="Social Links"
-                            description="Add your professional and portfolio links."
-                        >
-                            <div className="grid gap-5">
-
-                                <Field
-                                    label="LinkedIn"
-                                    value={form.linkedin}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "linkedin",
-                                            value
-                                        )
-                                    }
-                                    placeholder="https://linkedin.com/in/username"
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="GitHub"
-                                    value={form.github}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "github",
-                                            value
-                                        )
-                                    }
-                                    placeholder="https://github.com/username"
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Portfolio"
-                                    value={form.portfolio}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "portfolio",
-                                            value
-                                        )
-                                    }
-                                    placeholder="https://yourportfolio.com"
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                                <Field
-                                    label="Website"
-                                    value={form.website}
-                                    onChange={(value) =>
-                                        updateField(
-                                            "website",
-                                            value
-                                        )
-                                    }
-                                    placeholder="https://example.com"
-                                    className={inputClass}
-                                    labelClass={labelClass}
-                                />
-
-                            </div>
-                        </SettingsSection>
-                    )}
-
-                    {/* Save */}
-
-                    <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-
-                        <div className="text-sm">
-
-                            {success && (
-                                <p className="flex items-center gap-2 text-emerald-400">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    Profile updated successfully.
-                                </p>
-                            )}
-
-                            {error && (
-                                <p className="flex items-center gap-2 text-red-400">
-                                    <AlertCircle className="h-4 w-4" />
-                                    {error}
-                                </p>
-                            )}
-
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-6 py-3 font-semibold text-white shadow-lg shadow-cyan-500/10 transition hover:from-cyan-400 hover:to-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                            <Save className="h-4 w-4" />
-
-                            {saving
-                                ? "Saving..."
-                                : "Save Changes"}
-                        </button>
-
-                    </div>
-
-                </section>
             </div>
         </div>
     );
 }
 
-function SettingsSection({
+/* ---------------- Components ---------------- */
+
+function SettingsCard({
     icon: Icon,
     title,
     description,
     children,
+    danger = false,
 }: {
     icon: React.ElementType;
     title: string;
     description: string;
     children: React.ReactNode;
+    danger?: boolean;
 }) {
     return (
-        <div>
-            <div className="mb-8 flex items-center gap-4">
+        <section
+            className={`rounded-2xl border bg-white/[0.03] p-6 ${danger
+                ? "border-red-500/10"
+                : "border-white/10"
+                }`}
+        >
+            <div className="mb-6 flex items-center gap-4">
 
-                <div className="rounded-xl bg-cyan-500/10 p-3">
-                    <Icon className="h-5 w-5 text-cyan-300" />
+                <div
+                    className={`rounded-xl p-3 ${danger
+                        ? "bg-red-500/10"
+                        : "bg-cyan-500/10"
+                        }`}
+                >
+                    <Icon
+                        className={`h-5 w-5 ${danger
+                            ? "text-red-300"
+                            : "text-cyan-300"
+                            }`}
+                    />
                 </div>
 
                 <div>
-                    <h2 className="text-xl font-bold text-white">
+                    <h2 className="text-lg font-bold text-white">
                         {title}
                     </h2>
 
@@ -796,56 +665,200 @@ function SettingsSection({
             </div>
 
             {children}
+        </section>
+    );
+}
+
+function ToggleRow({
+    icon: Icon,
+    title,
+    description,
+    checked,
+    onChange,
+}: {
+    icon: React.ElementType;
+    title: string;
+    description: string;
+    checked: boolean;
+    onChange: (value: boolean) => void;
+}) {
+    return (
+        <div className="flex items-center gap-4 py-5">
+
+            <div className="hidden rounded-xl bg-white/5 p-3 sm:block">
+                <Icon className="h-5 w-5 text-slate-300" />
+            </div>
+
+            <div className="flex-1">
+                <h3 className="font-medium text-white">
+                    {title}
+                </h3>
+
+                <p className="mt-1 text-sm text-slate-500">
+                    {description}
+                </p>
+            </div>
+
+            <button
+                type="button"
+                role="switch"
+                aria-checked={checked}
+                onClick={() =>
+                    onChange(!checked)
+                }
+                className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked
+                    ? "bg-cyan-500"
+                    : "bg-slate-700"
+                    }`}
+            >
+                <span
+                    className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition ${checked
+                        ? "left-6"
+                        : "left-1"
+                        }`}
+                />
+            </button>
+
         </div>
     );
 }
 
-function Field({
+function ThemeButton({
+    active,
+    icon: Icon,
+    title,
+    description,
+    onClick,
+}: {
+    active: boolean;
+    icon: React.ElementType;
+    title: string;
+    description: string;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`rounded-xl border p-4 text-left transition ${active
+                ? "border-cyan-400/40 bg-cyan-400/10"
+                : "border-white/10 bg-white/[0.02] hover:bg-white/5"
+                }`}
+        >
+            <Icon
+                className={`h-5 w-5 ${active
+                    ? "text-cyan-300"
+                    : "text-slate-400"
+                    }`}
+            />
+
+            <p className="mt-3 font-semibold text-white">
+                {title}
+            </p>
+
+            <p className="mt-1 text-xs text-slate-500">
+                {description}
+            </p>
+        </button>
+    );
+}
+
+function LanguageButton({
+    active,
+    title,
+    subtitle,
+    onClick,
+}: {
+    active: boolean;
+    title: string;
+    subtitle: string;
+    onClick: () => void;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`rounded-xl border p-4 text-left transition ${active
+                ? "border-cyan-400/40 bg-cyan-400/10"
+                : "border-white/10 bg-white/[0.02] hover:bg-white/5"
+                }`}
+        >
+            <p className="font-semibold text-white">
+                {title}
+            </p>
+
+            <p className="mt-1 text-xs text-slate-500">
+                {subtitle}
+            </p>
+        </button>
+    );
+}
+
+function InfoRow({
     label,
     value,
-    onChange,
-    placeholder,
-    type = "text",
-    disabled = false,
-    required = false,
-    className,
-    labelClass,
+    valueClass = "text-slate-300",
 }: {
     label: string;
     value: string;
-    onChange?: (value: string) => void;
-    placeholder?: string;
-    type?: string;
-    disabled?: boolean;
-    required?: boolean;
-    className: string;
-    labelClass: string;
+    valueClass?: string;
 }) {
     return (
-        <div>
-            <label className={labelClass}>
+        <div className="flex items-center justify-between gap-4">
+            <span className="text-slate-500">
                 {label}
+            </span>
 
-                {required && (
-                    <span className="ml-1 text-red-400">
-                        *
-                    </span>
-                )}
-            </label>
-
-            <input
-                type={type}
-                value={value}
-                disabled={disabled}
-                onChange={(e) =>
-                    onChange?.(e.target.value)
-                }
-                placeholder={placeholder}
-                className={`${className} ${disabled
-                        ? "cursor-not-allowed opacity-60"
-                        : ""
-                    }`}
-            />
+            <span
+                className={`max-w-[190px] truncate text-right ${valueClass}`}
+            >
+                {value}
+            </span>
         </div>
+    );
+}
+
+function inputClass(disabled = false) {
+    return `w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3 text-white outline-none ${disabled
+        ? "cursor-not-allowed opacity-60"
+        : "focus:border-cyan-400/50"
+        }`;
+}
+
+function MonitorIcon({
+    className,
+}: {
+    className?: string;
+}) {
+    return (
+        <svg
+            className={className}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <rect
+                width="20"
+                height="14"
+                x="2"
+                y="3"
+                rx="2"
+            />
+            <line
+                x1="8"
+                x2="16"
+                y1="21"
+                y2="21"
+            />
+            <line
+                x1="12"
+                x2="12"
+                y1="17"
+                y2="21"
+            />
+        </svg>
     );
 }
