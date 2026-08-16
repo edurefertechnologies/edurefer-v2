@@ -66,15 +66,28 @@ export default function RegisterForm({
 
       if (referralCode) {
         try {
-          await fetch("/api/referrals/attach", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              referralCode,
-            }),
-          });
+          const response = await fetch(
+            "/api/referrals/attach",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                referralCode,
+              }),
+            }
+          );
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            console.warn(
+              "REFERRAL_ATTACH_REJECTED:",
+              result?.error ||
+              "Unable to attach referral."
+            );
+          }
         } catch (error) {
           console.error(
             "REFERRAL_ATTACH_ERROR:",

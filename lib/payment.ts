@@ -116,6 +116,7 @@ export async function completePayment({
           message: `You have successfully enrolled in ${course.title}.`,
           type: NotificationType.SUCCESS,
           actionUrl: `/learn/${course.slug}`,
+          preference: "course",
         });
       }
     }
@@ -300,6 +301,7 @@ export async function completePayment({
           message: `₹${REFERRAL.REWARD} referral reward has been credited to your wallet.`,
           type: NotificationType.SUCCESS,
           actionUrl: "/wallet",
+          preference: "referral",
         });
       }
 

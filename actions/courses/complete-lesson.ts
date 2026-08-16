@@ -191,6 +191,7 @@ export async function completeLesson(
             actionUrl: `/api/certificates/${encodeURIComponent(
               certificate.certificateNo
             )}/download`,
+            preference: "course",
           });
         }
       }

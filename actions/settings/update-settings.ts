@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth-server";
+import { revalidatePath } from "next/cache";
 
 export interface UpdateSettingsInput {
   courseNotifications: boolean;
@@ -64,6 +65,8 @@ export async function updateSettings(
       language: values.language,
     },
   });
+
+  revalidatePath("/settings");
 
   return {
     success: true,

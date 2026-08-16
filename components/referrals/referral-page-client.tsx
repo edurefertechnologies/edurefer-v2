@@ -80,6 +80,40 @@ export default function ReferralPageClient({
     }
   }
 
+  if (!data.eligible) {
+    return (
+      <div className="container-custom py-10">
+        <div className="mx-auto max-w-3xl">
+          <div className="rounded-3xl border border-amber-400/20 bg-amber-400/5 p-8 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-400/10">
+              <Link2 className="h-7 w-7 text-amber-300" />
+            </div>
+
+            <h1 className="mt-5 text-2xl font-bold text-white">
+              Referral Program
+            </h1>
+
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
+              Referral benefits become available after
+              you purchase at least one eligible product
+              or package from Edurefer.
+            </p>
+
+            <Button
+              type="button"
+              onClick={() => {
+                window.location.href = "/courses";
+              }}
+              className="mt-6"
+            >
+              Explore Courses
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container-custom py-10">
       <div className="mx-auto max-w-6xl">
