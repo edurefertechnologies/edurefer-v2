@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 import {
     Bell,
     BookOpen,
@@ -77,35 +78,15 @@ export default function SettingsPageClient({
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState("");
+    const { setTheme } = useTheme();
 
     /*
      * Keep the current application theme in sync
      * with the user's saved preference.
      */
     useEffect(() => {
-        const root =
-            document.documentElement;
-
-        if (form.theme === "light") {
-            root.classList.remove("dark");
-            return;
-        }
-
-        if (form.theme === "dark") {
-            root.classList.add("dark");
-            return;
-        }
-
-        const prefersDark =
-            window.matchMedia(
-                "(prefers-color-scheme: dark)"
-            ).matches;
-
-        root.classList.toggle(
-            "dark",
-            prefersDark
-        );
-    }, [form.theme]);
+        setTheme(form.theme);
+    }, [form.theme, setTheme]);
 
     function updateField<
         K extends keyof UpdateSettingsInput
