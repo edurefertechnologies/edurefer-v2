@@ -92,7 +92,7 @@ export default function Hero() {
               </Link>
 
               <Link
-                href="#bundles"
+                href="/pricing"
                 className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-6 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10"
               >
                 View Bundles
