@@ -7,6 +7,7 @@ import CTA from "@/components/home/cta";
 import FAQ from "@/components/home/faq";
 import Newsletter from "@/components/home/newsletter";
 import Pricing from "@/components/home/pricing";
+import Footer from "@/components/layout/footer";
 
 import { getPricingProducts } from "@/actions/products/get-pricing-products";
 
@@ -33,6 +34,8 @@ export default async function HomePage() {
       <FAQ />
 
       <Newsletter />
+
+      <Footer />
     </>
   );
 }
