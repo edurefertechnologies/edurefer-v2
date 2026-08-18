@@ -221,33 +221,35 @@ export default function ProductForm({
               </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">
-                AI Credits
-              </label>
+            {form.watch("type") === "AI_CREDITS" && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">
+                  AI Credits
+                </label>
 
-              <Input
-                type="number"
-                min="1"
-                step="1"
-                placeholder="e.g. 500"
-                {...form.register("credits", {
-                  setValueAs: (value) =>
-                    value === "" ? null : Number(value),
-                })}
-              />
+                <Input
+                  type="number"
+                  min="1"
+                  step="1"
+                  placeholder="e.g. 500"
+                  {...form.register("credits", {
+                    setValueAs: (value) =>
+                      value === "" ? null : Number(value),
+                  })}
+                />
 
-              <p className="text-xs text-muted-foreground">
-                Enter the number of AI credits included with this product.
-                Use only for AI Credits products.
-              </p>
-
-              {form.formState.errors.credits && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.credits.message}
+                <p className="text-xs text-muted-foreground">
+                  Enter the number of AI credits included with
+                  this product.
                 </p>
-              )}
-            </div>
+
+                {form.formState.errors.credits && (
+                  <p className="text-sm text-destructive">
+                    {form.formState.errors.credits.message}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
