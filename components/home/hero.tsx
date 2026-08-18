@@ -49,8 +49,8 @@ export default function Hero() {
   return (
     <section className="relative overflow-hidden py-24 lg:py-32">
       {/* Background Effects */}
-      <div className="absolute inset-0 hero-gradient" />
-      <div className="absolute inset-0 grid-bg opacity-30" />
+      <div className="pointer-events-none absolute inset-0 hero-gradient" />
+      <div className="pointer-events-none absolute inset-0 grid-bg opacity-30" />
 
       <Container>
         <div className="grid items-center gap-16 lg:grid-cols-2">

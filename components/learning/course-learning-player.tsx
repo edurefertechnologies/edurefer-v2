@@ -88,6 +88,11 @@ export default function CourseLearningPlayer({
       (lesson) => lesson.id === selectedLessonId
     ) ?? lessons[0];
 
+  const isCloudinaryPlayer =
+    selectedLesson.videoUrl?.startsWith(
+      "https://player.cloudinary.com/"
+    );
+
   const currentIndex = lessons.findIndex(
     (lesson) => lesson.id === selectedLesson.id
   );
@@ -372,66 +377,71 @@ export default function CourseLearningPlayer({
             {/* Video */}
             <div className="overflow-hidden rounded-xl bg-black">
               {selectedLesson.videoUrl ? (
-                <video
-                  key={selectedLesson.id}
-                  ref={videoRef}
-                  controls
-                  controlsList="nodownload"
-                  className="aspect-video w-full"
-                  src={selectedLesson.videoUrl}
+                isCloudinaryPlayer ? (
+                  <iframe
+                    key={selectedLesson.id}
+                    src={selectedLesson.videoUrl}
+                    title={selectedLesson.title}
+                    className="aspect-video w-full"
+                    allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <video
+                    key={selectedLesson.id}
+                    ref={videoRef}
+                    controls
+                    controlsList="nodownload"
+                    className="aspect-video w-full"
+                    src={selectedLesson.videoUrl}
+                    onLoadedMetadata={(event) => {
+                      const video = event.currentTarget;
 
-                  onLoadedMetadata={(event) => {
-                    const video = event.currentTarget;
-
-                    if (
-                      savedWatchSeconds > 0 &&
-                      savedWatchSeconds < video.duration
-                    ) {
-                      video.currentTime = savedWatchSeconds;
-                      lastSavedTimeRef.current =
-                        savedWatchSeconds;
-                    }
-                  }}
-
-                  onTimeUpdate={(event) => {
-                    const video = event.currentTarget;
-                    const currentSeconds = Math.floor(
-                      video.currentTime
-                    );
-
-                    // Save approximately every 15 seconds
-                    if (
-                      currentSeconds -
-                      lastSavedTimeRef.current >=
-                      15
-                    ) {
-                      void saveCurrentVideoProgress(
-                        currentSeconds
+                      if (
+                        savedWatchSeconds > 0 &&
+                        savedWatchSeconds < video.duration
+                      ) {
+                        video.currentTime = savedWatchSeconds;
+                        lastSavedTimeRef.current =
+                          savedWatchSeconds;
+                      }
+                    }}
+                    onTimeUpdate={(event) => {
+                      const video = event.currentTarget;
+                      const currentSeconds = Math.floor(
+                        video.currentTime
                       );
-                    }
-                  }}
 
-                  onPause={(event) => {
-                    void saveCurrentVideoProgress(
-                      event.currentTarget.currentTime
-                    );
-                  }}
-
-                  onEnded={(event) => {
-                    void saveCurrentVideoProgress(
-                      event.currentTarget.duration
-                    );
-                  }}
-                >
-                  Your browser does not support video playback.
-                </video>
+                      if (
+                        currentSeconds -
+                        lastSavedTimeRef.current >=
+                        15
+                      ) {
+                        void saveCurrentVideoProgress(
+                          currentSeconds
+                        );
+                      }
+                    }}
+                    onPause={(event) => {
+                      void saveCurrentVideoProgress(
+                        event.currentTarget.currentTime
+                      );
+                    }}
+                    onEnded={(event) => {
+                      void saveCurrentVideoProgress(
+                        event.currentTarget.duration
+                      );
+                    }}
+                  >
+                    Your browser does not support video playback.
+                  </video>
+                )
               ) : (
                 <div className="flex aspect-video flex-col items-center justify-center p-6 text-center text-white">
                   <BookOpen className="mb-3 h-10 w-10 opacity-70" />
 
                   <p className="font-medium">
-                    No video available for this
-                    lesson.
+                    No video available for this lesson.
                   </p>
                 </div>
               )}
