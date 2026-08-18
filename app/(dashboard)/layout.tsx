@@ -34,6 +34,12 @@ export default async function DashboardLayout({
       email: true,
       image: true,
       emailVerified: true,
+
+      settings: {
+        select: {
+          language: true,
+        },
+      },
     },
   });
 
@@ -73,9 +79,17 @@ export default async function DashboardLayout({
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.03)_1px,transparent_1px)] bg-[size:50px_50px]" />
 
         <AppSidebar
-          user={user ?? session.user}
+          user={{
+            ...(user ?? session.user),
+            language:
+              user?.settings?.language === "hi"
+                ? "hi"
+                : user?.settings?.language === "mr"
+                  ? "mr"
+                  : "en",
+          }}
           canRefer={canRefer}
-          />
+        />
 
         <SidebarInset className="relative z-10 bg-transparent">
 

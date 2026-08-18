@@ -13,6 +13,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { translations } from "@/lib/il8n/translation";
 
 import { LogoutButton } from "@/components/auth/logout-button";
 import { navItems } from "./nav-items";
@@ -23,6 +24,7 @@ type AppSidebarProps = {
     lastName?: string | null;
     email: string;
     image?: string | null;
+    language?: "en" | "hi" | "mr";
   };
 
   canRefer: boolean;
@@ -33,6 +35,24 @@ export function AppSidebar({
   canRefer,
 }: AppSidebarProps) {
   const pathname = usePathname();
+
+  const language: "en" | "hi" | "mr" = user.language ?? "en";
+
+  const t = translations[language];
+
+  const navLabels = {
+    Dashboard: t.dashboard,
+    Courses: t.courses,
+    "Saved Courses": t.savedCourses,
+    Notifications: t.notifications,
+    "My Learning": t.myLearning,
+    "AI Assistant": t.aiAssistant,
+    Wallet: t.wallet,
+    Referrals: t.referrals,
+    Orders: t.orders,
+    Profile: t.profile,
+    Settings: t.settings,
+  };
 
   return (
     <Sidebar
@@ -111,7 +131,7 @@ export function AppSidebar({
         <div className="mb-8">
 
           <p className="mb-3 px-3 text-[11px] font-bold uppercase tracking-[0.25em] text-cyan-300/70">
-            Overview
+            {t.overview}
           </p>
 
           <SidebarMenu>
@@ -196,7 +216,7 @@ export function AppSidebar({
                             }
                     `}
                         >
-                          {item.title}
+                          {navLabels[item.title as keyof typeof navLabels]}
                         </span>
 
                       </Link>
@@ -218,7 +238,7 @@ export function AppSidebar({
         <div>
 
           <p className="mb-3 px-3 text-[11px] font-bold uppercase tracking-[0.25em] text-emerald-300/70">
-            Workspace
+            {t.workspace}
           </p>
 
           <SidebarMenu>
@@ -306,7 +326,7 @@ export function AppSidebar({
                               }
                     `}
                           >
-                            {item.title}
+                            {navLabels[item.title as keyof typeof navLabels]}
                           </span>
 
                         </Link>
