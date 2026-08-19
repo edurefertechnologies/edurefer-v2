@@ -15,7 +15,7 @@ import Logo from "@/components/common/logo";
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="min-h-[400px] bg-red-500 border-4 border-yellow-400">
       <div className="container-custom py-16">
 
         {/* Main Footer */}
