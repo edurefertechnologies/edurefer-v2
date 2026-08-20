@@ -8,9 +8,12 @@ import {
   FileText,
   ShieldCheck,
   Sparkles,
+  Users,
   Zap,
 } from "lucide-react";
+import { motion } from "framer-motion";
 
+import Container from "@/components/layout/container";
 import { prisma } from "@/lib/prisma";
 
 interface Props {
@@ -37,11 +40,13 @@ export default async function ProductDetailsPage({
       price: true,
       discountPrice: true,
       thumbnail: true,
+      fileUrl: true,
       type: true,
       status: true,
       isDeleted: true,
       currency: true,
       credits: true,
+      isFeatured: true,
     },
   });
 
@@ -56,10 +61,13 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
-  // Courses have their own dedicated preview page.
+  // Course products have their own dedicated course page.
   if (product.type === "COURSE") {
     notFound();
   }
+
+  const isPdf = product.type === "PDF";
+  const isAiCredits = product.type === "AI_CREDITS";
 
   const originalPrice = Number(product.price);
 
@@ -79,47 +87,43 @@ export default async function ProductDetailsPage({
       )
       : 0;
 
-  const isPdf = product.type === "PDF";
-  const isAiCredits = product.type === "AI_CREDITS";
+  /*
+   * Count paid orders for this product.
+   *
+   * This is intentionally calculated from OrderItem
+   * instead of showing a hardcoded number.
+   */
+  const purchaseCount = await prisma.orderItem.count({
+    where: {
+      productId: product.id,
+      order: {
+        status: "PAID",
+      },
+    },
+  });
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen">
       {/* =====================================================
           HERO
       ====================================================== */}
-      <section className="border-b">
-        <div className="container mx-auto px-4 py-10 lg:py-16">
-          <div className="grid items-center gap-10 lg:grid-cols-2">
-            {/* Product Thumbnail */}
-            <div className="overflow-hidden rounded-2xl border bg-muted shadow-sm">
-              {product.thumbnail ? (
-                <Image
-                  src={product.thumbnail}
-                  alt={product.name}
-                  width={1000}
-                  height={700}
-                  priority
-                  className="h-auto w-full object-cover"
-                />
-              ) : (
-                <div className="flex aspect-video items-center justify-center">
-                  {isPdf ? (
-                    <FileText className="h-20 w-20 text-muted-foreground" />
-                  ) : (
-                    <Sparkles className="h-20 w-20 text-muted-foreground" />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Product Information */}
-            <div>
+      <section className="section">
+        <Container>
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            {/* =================================================
+                LEFT CONTENT
+            ================================================== */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+            >
               {/* Product Type */}
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                 {isPdf ? (
                   <>
                     <FileText className="h-4 w-4" />
-                    PDF Kit
+                    PDF / Digital Kit
                   </>
                 ) : (
                   <>
@@ -127,289 +131,443 @@ export default async function ProductDetailsPage({
                     AI Credits
                   </>
                 )}
-              </div>
+              </span>
 
-              {/* Product Name */}
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+              {/* Featured */}
+              {product.isFeatured && (
+                <span className="ml-2 inline-flex items-center rounded-full bg-yellow-500/10 px-4 py-2 text-sm font-medium text-yellow-600">
+                  Featured
+                </span>
+              )}
+
+              {/* Title */}
+              <h1 className="mt-6 text-4xl font-bold leading-tight sm:text-5xl">
                 {product.name}
               </h1>
 
               {/* Short Description */}
               {product.shortDescription && (
-                <p className="mt-5 text-lg leading-8 text-muted-foreground">
+                <p className="mt-6 text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
                   {product.shortDescription}
                 </p>
               )}
 
-              {/* AI Credits */}
-              {isAiCredits &&
-                product.credits !== null && (
-                  <div className="mt-7 rounded-2xl border p-6">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-xl border p-3">
-                        <Sparkles className="h-6 w-6" />
-                      </div>
+              {/* Product Stats */}
+              <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
+                {purchaseCount > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
 
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          Included AI Credits
-                        </p>
-
-                        <p className="text-3xl font-bold">
-                          {product.credits.toLocaleString(
-                            "en-IN"
-                          )}
-                        </p>
-                      </div>
-                    </div>
+                    <span>
+                      {purchaseCount.toLocaleString(
+                        "en-IN"
+                      )}{" "}
+                      {purchaseCount === 1
+                        ? "Purchase"
+                        : "Purchases"}
+                    </span>
                   </div>
                 )}
 
-              {/* Product Highlights */}
-              <div className="mt-7 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-xl border p-4">
-                  {isPdf ? (
-                    <FileText className="mb-2 h-5 w-5" />
-                  ) : (
-                    <Sparkles className="mb-2 h-5 w-5" />
+                {isAiCredits &&
+                  product.credits !== null && (
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+
+                      <span>
+                        {product.credits.toLocaleString(
+                          "en-IN"
+                        )}{" "}
+                        AI Credits
+                      </span>
+                    </div>
                   )}
 
-                  <p className="text-sm font-semibold">
-                    {isPdf
-                      ? "Digital Product"
-                      : "AI Credits"}
-                  </p>
+                {isPdf && (
+                  <div className="flex items-center gap-2">
+                    <Download className="h-5 w-5 text-primary" />
 
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {isPdf
-                      ? "Digital resource"
-                      : "Use across AI tools"}
-                  </p>
-                </div>
+                    <span>
+                      Digital PDF Product
+                    </span>
+                  </div>
+                )}
 
-                <div className="rounded-xl border p-4">
-                  <Zap className="mb-2 h-5 w-5" />
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-primary" />
 
-                  <p className="text-sm font-semibold">
-                    Instant Access
-                  </p>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    After purchase
-                  </p>
-                </div>
-
-                <div className="rounded-xl border p-4">
-                  <ShieldCheck className="mb-2 h-5 w-5" />
-
-                  <p className="text-sm font-semibold">
-                    Secure Purchase
-                  </p>
-
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Secure checkout
-                  </p>
+                  <span>Secure Purchase</span>
                 </div>
               </div>
 
-              {/* Pricing */}
-              <div className="mt-8 rounded-2xl border p-6">
-                <div className="flex flex-wrap items-end gap-3">
-                  <span className="text-4xl font-bold">
-                    ₹{sellingPrice.toLocaleString("en-IN")}
+              {/* Actions */}
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <Link
+                  href={`/product-checkout/${product.slug}`}
+                  className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                >
+                  {isAiCredits
+                    ? "Get AI Credits"
+                    : "Get This Kit"}
+
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+
+                <Link
+                  href="#overview"
+                  className="inline-flex items-center justify-center rounded-lg border px-6 py-3 text-base font-semibold transition-colors hover:bg-muted"
+                >
+                  View Details
+                </Link>
+              </div>
+            </motion.div>
+
+            {/* =================================================
+                RIGHT PRODUCT CARD
+            ================================================== */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="glass-card overflow-hidden"
+            >
+              {/* Thumbnail */}
+              {product.thumbnail ? (
+                <Image
+                  src={product.thumbnail}
+                  alt={product.name}
+                  width={700}
+                  height={500}
+                  priority
+                  className="aspect-video w-full object-cover"
+                />
+              ) : (
+                <div className="flex aspect-video w-full items-center justify-center bg-muted">
+                  {isPdf ? (
+                    <FileText className="h-20 w-20 text-muted-foreground" />
+                  ) : (
+                    <Sparkles className="h-20 w-20 text-muted-foreground" />
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-5 p-5 sm:p-8">
+                {/* Price */}
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">
+                    Product Price
                   </span>
 
-                  {discountAmount > 0 && (
-                    <>
-                      <span className="text-lg text-muted-foreground line-through">
+                  <div className="text-right">
+                    {discountAmount > 0 ? (
+                      <>
+                        <span className="text-3xl font-bold text-primary">
+                          ₹
+                          {sellingPrice.toLocaleString(
+                            "en-IN"
+                          )}
+                        </span>
+
+                        <span className="ml-2 text-sm text-muted-foreground line-through">
+                          ₹
+                          {originalPrice.toLocaleString(
+                            "en-IN"
+                          )}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-3xl font-bold text-primary">
                         ₹
                         {originalPrice.toLocaleString(
                           "en-IN"
                         )}
                       </span>
-
-                      <span className="rounded-full bg-green-100 px-2.5 py-1 text-sm font-semibold text-green-700">
-                        {discountPercentage}% OFF
-                      </span>
-                    </>
-                  )}
+                    )}
+                  </div>
                 </div>
 
+                {/* Discount */}
                 {discountAmount > 0 && (
-                  <p className="mt-2 text-sm text-green-600">
-                    You save ₹
-                    {discountAmount.toLocaleString(
-                      "en-IN"
-                    )}
-                  </p>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-muted-foreground">
+                      Discount
+                    </span>
+
+                    <span className="font-medium text-green-600">
+                      {discountPercentage}% OFF
+                    </span>
+                  </div>
                 )}
 
+                {/* Type */}
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">
+                    Product Type
+                  </span>
+
+                  <span>
+                    {isPdf
+                      ? "PDF / Digital Kit"
+                      : "AI Credits"}
+                  </span>
+                </div>
+
+                {/* AI Credits */}
+                {isAiCredits &&
+                  product.credits !== null && (
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="text-muted-foreground">
+                        AI Credits
+                      </span>
+
+                      <span className="font-medium">
+                        {product.credits.toLocaleString(
+                          "en-IN"
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                {/* Access */}
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-muted-foreground">
+                    Access
+                  </span>
+
+                  <span>Digital</span>
+                </div>
+
+                {/* Purchase Count */}
+                {purchaseCount > 0 && (
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-muted-foreground">
+                      Purchased
+                    </span>
+
+                    <span>
+                      {purchaseCount.toLocaleString(
+                        "en-IN"
+                      )}{" "}
+                      users
+                    </span>
+                  </div>
+                )}
+
+                {/* CTA */}
                 <Link
-                  href={`/products/${product.slug}/checkout`}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+                  href={`/product-checkout/${product.slug}`}
+                  className="mt-6 flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
-                  Buy Now
-                  <ArrowRight className="h-4 w-4" />
+                  {isAiCredits
+                    ? "Get AI Credits"
+                    : "Get This Kit"}
+
+                  <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
 
-                <p className="mt-3 text-center text-xs text-muted-foreground">
-                  Secure payment • Access after successful
-                  purchase
+                <p className="text-center text-xs text-muted-foreground">
+                  Secure payment • Digital access after
+                  successful purchase
                 </p>
               </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* =====================================================
-          ABOUT PRODUCT
+          OVERVIEW
       ====================================================== */}
-      {product.description && (
-        <section className="container mx-auto px-4 py-14">
+      <section
+        id="overview"
+        className="section border-t"
+      >
+        <Container>
           <div className="mx-auto max-w-4xl">
-            <p className="text-sm font-medium text-muted-foreground">
-              About this product
-            </p>
+            <div className="text-center">
+              <span className="text-sm font-medium text-primary">
+                Product Overview
+              </span>
 
-            <h2 className="mt-2 text-3xl font-bold">
-              {product.name}
-            </h2>
-
-            <div className="mt-7 rounded-2xl border p-6 lg:p-8">
-              <div className="whitespace-pre-line text-base leading-8 text-muted-foreground">
-                {product.description}
-              </div>
+              <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
+                About {product.name}
+              </h2>
             </div>
+
+            {product.description ? (
+              <div className="mt-8 rounded-2xl border p-6 sm:p-8">
+                <div className="whitespace-pre-line text-base leading-8 text-muted-foreground">
+                  {product.description}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-8 rounded-2xl border p-6 text-center">
+                <p className="text-muted-foreground">
+                  Product details will be available
+                  soon.
+                </p>
+              </div>
+            )}
           </div>
-        </section>
-      )}
+        </Container>
+      </section>
 
       {/* =====================================================
-          PRODUCT INFORMATION
+          PRODUCT DETAILS
       ====================================================== */}
-      <section className="border-t bg-muted/30">
-        <div className="container mx-auto px-4 py-14">
+      <section className="section bg-muted/20">
+        <Container>
           <div className="mx-auto max-w-5xl">
             <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                Product Information
-              </p>
+              <span className="text-sm font-medium text-primary">
+                Product Details
+              </span>
 
-              <h2 className="mt-2 text-3xl font-bold">
+              <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
                 What You Get
               </h2>
             </div>
 
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid gap-5 md:grid-cols-2">
               {/* Product Type */}
               <div className="rounded-2xl border bg-background p-6">
-                {isPdf ? (
-                  <FileText className="mb-4 h-6 w-6" />
-                ) : (
-                  <Sparkles className="mb-4 h-6 w-6" />
-                )}
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl bg-primary/10 p-3">
+                    {isPdf ? (
+                      <FileText className="h-6 w-6 text-primary" />
+                    ) : (
+                      <Sparkles className="h-6 w-6 text-primary" />
+                    )}
+                  </div>
 
-                <h3 className="font-semibold">
-                  Product Type
-                </h3>
-
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {isPdf
-                    ? "Digital PDF Kit"
-                    : "AI Credits"}
-                </p>
-              </div>
-
-              {/* AI Credits */}
-              {isAiCredits &&
-                product.credits !== null && (
-                  <div className="rounded-2xl border bg-background p-6">
-                    <Sparkles className="mb-4 h-6 w-6" />
-
+                  <div>
                     <h3 className="font-semibold">
-                      AI Credits
+                      {isPdf
+                        ? "Digital PDF Kit"
+                        : "AI Credits Package"}
                     </h3>
 
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {product.credits.toLocaleString(
-                        "en-IN"
-                      )}{" "}
-                      credits included
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {isPdf
+                        ? "A digital PDF product available through your Edurefer purchase."
+                        : product.credits !== null
+                          ? `${product.credits.toLocaleString(
+                            "en-IN"
+                          )} AI credits are included with this product.`
+                          : "AI credits are included with this product."}
                     </p>
                   </div>
-                )}
+                </div>
+              </div>
 
-              {/* Digital Access */}
+              {/* Instant Access */}
               <div className="rounded-2xl border bg-background p-6">
-                <CheckCircle2 className="mb-4 h-6 w-6" />
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl bg-primary/10 p-3">
+                    <Zap className="h-6 w-6 text-primary" />
+                  </div>
 
-                <h3 className="font-semibold">
-                  Digital Access
-                </h3>
+                  <div>
+                    <h3 className="font-semibold">
+                      Digital Access
+                    </h3>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Available through your Edurefer account
-                  after successful purchase.
-                </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      Access is provided through your
+                      Edurefer account after a successful
+                      purchase.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Secure Purchase */}
               <div className="rounded-2xl border bg-background p-6">
-                <ShieldCheck className="mb-4 h-6 w-6" />
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl bg-primary/10 p-3">
+                    <ShieldCheck className="h-6 w-6 text-primary" />
+                  </div>
 
-                <h3 className="font-semibold">
-                  Secure Purchase
-                </h3>
+                  <div>
+                    <h3 className="font-semibold">
+                      Secure Purchase
+                    </h3>
 
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Payments are processed through the
-                  existing secure checkout system.
-                </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      Payments are handled through
+                      Edurefer's existing secure payment
+                      flow.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              {/* PDF */}
-              {isPdf && (
-                <div className="rounded-2xl border bg-background p-6">
-                  <Download className="mb-4 h-6 w-6" />
+              {/* Purchase Count */}
+              <div className="rounded-2xl border bg-background p-6">
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl bg-primary/10 p-3">
+                    <Users className="h-6 w-6 text-primary" />
+                  </div>
 
-                  <h3 className="font-semibold">
-                    Digital Resource
-                  </h3>
+                  <div>
+                    <h3 className="font-semibold">
+                      Community
+                    </h3>
 
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Your purchased PDF will be available
-                    according to the product access flow.
-                  </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {purchaseCount > 0
+                        ? `${purchaseCount.toLocaleString(
+                          "en-IN"
+                        )} ${purchaseCount === 1
+                          ? "purchase"
+                          : "purchases"
+                        } recorded for this product.`
+                        : "Be among the first to purchase this product."}
+                    </p>
+                  </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
 
       {/* =====================================================
           FINAL CTA
       ====================================================== */}
-      <section className="container mx-auto px-4 py-14">
-        <div className="mx-auto max-w-3xl rounded-2xl border p-8 text-center lg:p-10">
-          <h2 className="text-3xl font-bold">
-            Get {product.name}
-          </h2>
+      <section className="section">
+        <Container>
+          <div className="mx-auto max-w-3xl rounded-2xl border p-8 text-center sm:p-10">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+              {isPdf ? (
+                <FileText className="h-7 w-7 text-primary" />
+              ) : (
+                <Sparkles className="h-7 w-7 text-primary" />
+              )}
+            </div>
 
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Get access to this product through your
-            Edurefer account.
-          </p>
+            <h2 className="mt-6 text-3xl font-bold">
+              Get {product.name}
+            </h2>
 
-          <Link
-            href={`/products/${product.slug}/checkout`}
-            className="mx-auto mt-7 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            Continue to Checkout
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+              {isAiCredits
+                ? "Purchase your AI credits and use them through your Edurefer account."
+                : "Get instant access to your digital product after successful purchase."}
+            </p>
+
+            <Link
+              href={`/product-checkout/${product.slug}`}
+              className="mx-auto mt-7 inline-flex items-center justify-center rounded-lg bg-primary px-7 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+            >
+              {isAiCredits
+                ? "Get AI Credits"
+                : "Get This Kit"}
+
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </Container>
       </section>
     </main>
   );

@@ -10,6 +10,7 @@ import {
   Settings,
   User,
   Users,
+  BoxIcon,
 } from "lucide-react";
 
 export const navItems = [
@@ -22,6 +23,11 @@ export const navItems = [
     title: "Courses",
     href: "/courses",
     icon: BookOpen,
+  },
+  {
+    title: "Products Pricing",
+    href: "/pricing",
+    icon: BoxIcon,
   },
   {
     title: "Saved Courses",
