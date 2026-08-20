@@ -43,6 +43,7 @@ export function AppSidebar({
   const navLabels = {
     Dashboard: t.dashboard,
     Courses: t.courses,
+    "Products Pricing": t.productsPricing,
     "Saved Courses": t.savedCourses,
     Notifications: t.notifications,
     "My Learning": t.myLearning,

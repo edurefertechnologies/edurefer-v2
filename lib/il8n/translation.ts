@@ -2,6 +2,7 @@ export const translations = {
   en: {
     dashboard: "Dashboard",
     courses: "Courses",
+    productsPricing: "Products Pricing",
     savedCourses: "Saved Courses",
     notifications: "Notifications",
     myLearning: "My Learning",
@@ -20,6 +21,7 @@ export const translations = {
   hi: {
     dashboard: "डैशबोर्ड",
     courses: "कोर्स",
+    productsPricing: "प्रॉडक्टस की कीमत",
     savedCourses: "सेव किए गए कोर्स",
     notifications: "सूचनाएं",
     myLearning: "मेरी पढ़ाई",
@@ -38,6 +40,7 @@ export const translations = {
   mr: {
     dashboard: "डॅशबोर्ड",
     courses: "कोर्सेस",
+    productsPricing: "सगळ्या प्रॉडक्टस चे किंमत",
     savedCourses: "सेव्ह केलेले कोर्सेस",
     notifications: "सूचना",
     myLearning: "माझे शिक्षण",

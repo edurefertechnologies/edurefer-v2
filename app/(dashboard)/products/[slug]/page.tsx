@@ -11,7 +11,6 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 import Container from "@/components/layout/container";
 import { prisma } from "@/lib/prisma";
@@ -44,7 +43,7 @@ export default async function ProductDetailsPage({
       type: true,
       status: true,
       isDeleted: true,
-      currency: true,
+
       credits: true,
       isFeatured: true,
     },
@@ -113,11 +112,7 @@ export default async function ProductDetailsPage({
             {/* =================================================
                 LEFT CONTENT
             ================================================== */}
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+            <div>
               {/* Product Type */}
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
                 {isPdf ? (
@@ -220,17 +215,12 @@ export default async function ProductDetailsPage({
                   View Details
                 </Link>
               </div>
-            </motion.div>
+            </div>
 
             {/* =================================================
                 RIGHT PRODUCT CARD
             ================================================== */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6 }}
-              className="glass-card overflow-hidden"
-            >
+            <div className="glass-card overflow-hidden">
               {/* Thumbnail */}
               {product.thumbnail ? (
                 <Image
@@ -370,7 +360,7 @@ export default async function ProductDetailsPage({
                   successful purchase
                 </p>
               </div>
-            </motion.div>
+            </div>
           </div>
         </Container>
       </section>
