@@ -198,7 +198,7 @@ export default async function ProductDetailsPage({
               {/* Actions */}
               <div className="mt-10 flex flex-col gap-4 sm:flex-row">
                 <Link
-                  href={`/product-checkout/${product.slug}`}
+                  href={`/checkout/${product.slug}`}
                   className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-base font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   {isAiCredits
@@ -345,7 +345,7 @@ export default async function ProductDetailsPage({
 
                 {/* CTA */}
                 <Link
-                  href={`/product-checkout/${product.slug}`}
+                  href={`/checkout/${product.slug}`}
                   className="mt-6 flex w-full items-center justify-center rounded-lg bg-primary px-5 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
                 >
                   {isAiCredits
@@ -547,7 +547,7 @@ export default async function ProductDetailsPage({
             </p>
 
             <Link
-              href={`/product-checkout/${product.slug}`}
+              href={`/checkout/${product.slug}`}
               className="mx-auto mt-7 inline-flex items-center justify-center rounded-lg bg-primary px-7 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
             >
               {isAiCredits
