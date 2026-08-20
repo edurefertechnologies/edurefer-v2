@@ -35,6 +35,12 @@ export const createProductSchema = z.object({
     .nullable()
     .optional(),
 
+  fileUrl: z
+    .string()
+    .url("Invalid file URL")
+    .nullable()
+    .optional(),
+
   type: z.enum([
     "PDF",
     "COURSE",

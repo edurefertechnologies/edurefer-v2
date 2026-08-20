@@ -4,7 +4,14 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ImageIcon, IndianRupee, Package, Save } from "lucide-react";
+import {
+  FileText,
+  ImageIcon,
+  IndianRupee,
+  Package,
+  Save,
+  Sparkles,
+} from "lucide-react";
 
 import {
   createProductSchema,
@@ -45,6 +52,7 @@ export default function ProductForm({
       credits: null,
       discountPrice: null,
       thumbnail: null,
+      fileUrl: null,
       type: "COURSE",
       status: "DRAFT",
       isFeatured: false,
@@ -53,6 +61,7 @@ export default function ProductForm({
   });
 
   const productName = form.watch("name");
+  const productType = form.watch("type");
 
   useEffect(() => {
     if (defaultValues?.slug) return;
@@ -73,7 +82,10 @@ export default function ProductForm({
       onSubmit={form.handleSubmit(onSubmit)}
       className="space-y-6"
     >
-      {/* Basic Information */}
+      {/* ===================================================== */}
+      {/* BASIC INFORMATION */}
+      {/* ===================================================== */}
+
       <section className="rounded-xl border bg-background">
         <div className="flex items-center gap-3 border-b px-6 py-5">
           <div className="rounded-lg bg-muted p-2">
@@ -84,6 +96,7 @@ export default function ProductForm({
             <h2 className="font-semibold">
               Basic Information
             </h2>
+
             <p className="text-sm text-muted-foreground">
               Enter the main details of your product.
             </p>
@@ -92,6 +105,7 @@ export default function ProductForm({
 
         <div className="space-y-5 p-6">
           <div className="grid gap-5 md:grid-cols-2">
+            {/* Product Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Product Name
@@ -109,6 +123,7 @@ export default function ProductForm({
               )}
             </div>
 
+            {/* Slug */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Slug
@@ -131,6 +146,7 @@ export default function ProductForm({
             </div>
           </div>
 
+          {/* Short Description */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
               Short Description
@@ -144,6 +160,7 @@ export default function ProductForm({
             />
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <label className="text-sm font-medium">
               Description
@@ -159,8 +176,12 @@ export default function ProductForm({
         </div>
       </section>
 
-      {/* Pricing + Thumbnail */}
+      {/* ===================================================== */}
+      {/* PRICING + THUMBNAIL */}
+      {/* ===================================================== */}
+
       <div className="grid gap-6 lg:grid-cols-2">
+        {/* Pricing */}
         <section className="rounded-xl border bg-background">
           <div className="flex items-center gap-3 border-b px-6 py-5">
             <div className="rounded-lg bg-muted p-2">
@@ -171,6 +192,7 @@ export default function ProductForm({
               <h2 className="font-semibold">
                 Pricing
               </h2>
+
               <p className="text-sm text-muted-foreground">
                 Configure product pricing.
               </p>
@@ -178,6 +200,7 @@ export default function ProductForm({
           </div>
 
           <div className="space-y-5 p-6">
+            {/* Regular Price */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Regular Price (₹)
@@ -200,6 +223,7 @@ export default function ProductForm({
               )}
             </div>
 
+            {/* Discount Price */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Discount Price (₹)
@@ -221,11 +245,16 @@ export default function ProductForm({
               </p>
             </div>
 
-            {form.watch("type") === "AI_CREDITS" && (
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  AI Credits
-                </label>
+            {/* AI CREDITS */}
+            {productType === "AI_CREDITS" && (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <div className="mb-3 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+
+                  <label className="text-sm font-semibold">
+                    AI Credits
+                  </label>
+                </div>
 
                 <Input
                   type="number"
@@ -238,13 +267,13 @@ export default function ProductForm({
                   })}
                 />
 
-                <p className="text-xs text-muted-foreground">
-                  Enter the number of AI credits included with
-                  this product.
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Enter the number of AI credits included with this
+                  product.
                 </p>
 
                 {form.formState.errors.credits && (
-                  <p className="text-sm text-destructive">
+                  <p className="mt-2 text-sm text-destructive">
                     {form.formState.errors.credits.message}
                   </p>
                 )}
@@ -253,6 +282,7 @@ export default function ProductForm({
           </div>
         </section>
 
+        {/* Thumbnail */}
         <section className="rounded-xl border bg-background">
           <div className="flex items-center gap-3 border-b px-6 py-5">
             <div className="rounded-lg bg-muted p-2">
@@ -263,6 +293,7 @@ export default function ProductForm({
               <h2 className="font-semibold">
                 Product Thumbnail
               </h2>
+
               <p className="text-sm text-muted-foreground">
                 Upload the product cover image.
               </p>
@@ -293,7 +324,61 @@ export default function ProductForm({
         </section>
       </div>
 
-      {/* Product Settings */}
+      {/* ===================================================== */}
+      {/* DIGITAL PRODUCT URL */}
+      {/* ===================================================== */}
+
+      {productType === "PDF" && (
+        <section className="rounded-xl border border-primary/20 bg-background">
+          <div className="flex items-center gap-3 border-b px-6 py-5">
+            <div className="rounded-lg bg-muted p-2">
+              <FileText className="h-5 w-5" />
+            </div>
+
+            <div>
+              <h2 className="font-semibold">
+                Digital Product
+              </h2>
+
+              <p className="text-sm text-muted-foreground">
+                Add the Cloudinary URL of your PDF or digital kit.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2 p-6">
+            <label
+              htmlFor="fileUrl"
+              className="text-sm font-medium"
+            >
+              PDF / Digital Product URL
+            </label>
+
+            <Input
+              id="fileUrl"
+              type="url"
+              placeholder="https://res.cloudinary.com/..."
+              {...form.register("fileUrl")}
+            />
+
+            <p className="text-xs text-muted-foreground">
+              Paste the public Cloudinary URL of your PDF or digital
+              product.
+            </p>
+
+            {form.formState.errors.fileUrl && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.fileUrl.message}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ===================================================== */}
+      {/* PRODUCT SETTINGS */}
+      {/* ===================================================== */}
+
       <section className="rounded-xl border bg-background">
         <div className="border-b px-6 py-5">
           <h2 className="font-semibold">
@@ -307,6 +392,7 @@ export default function ProductForm({
 
         <div className="space-y-6 p-6">
           <div className="grid gap-5 md:grid-cols-2">
+            {/* Product Type */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Product Type
@@ -316,10 +402,6 @@ export default function ProductForm({
                 {...form.register("type")}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <option value="PACKAGE">
-                  Package / Bundle
-                </option>
-
                 <option value="COURSE">
                   Course
                 </option>
@@ -332,8 +414,15 @@ export default function ProductForm({
                   AI Credits
                 </option>
               </select>
+
+              {form.formState.errors.type && (
+                <p className="text-sm text-destructive">
+                  {form.formState.errors.type.message}
+                </p>
+              )}
             </div>
 
+            {/* Status */}
             <div className="space-y-2">
               <label className="text-sm font-medium">
                 Status
@@ -358,6 +447,7 @@ export default function ProductForm({
             </div>
           </div>
 
+          {/* Featured */}
           <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/40">
             <input
               type="checkbox"
@@ -371,15 +461,18 @@ export default function ProductForm({
               </p>
 
               <p className="text-xs text-muted-foreground">
-                Highlight this product in featured sections
-                across the platform.
+                Highlight this product in featured sections across
+                the platform.
               </p>
             </div>
           </label>
         </div>
       </section>
 
-      {/* Actions */}
+      {/* ===================================================== */}
+      {/* ACTIONS */}
+      {/* ===================================================== */}
+
       <div className="flex items-center justify-end gap-3 border-t pt-6">
         <Button
           variant="outline"

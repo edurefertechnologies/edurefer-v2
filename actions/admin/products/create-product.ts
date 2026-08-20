@@ -9,6 +9,11 @@ export async function createProduct(values: unknown) {
     const result = createProductSchema.safeParse(values);
 
     if (!result.success) {
+      console.error(
+        "CREATE_PRODUCT_VALIDATION_ERROR:",
+        result.error.flatten()
+      );
+
       return {
         success: false,
         message: "Please check the entered product details.",
@@ -35,13 +40,21 @@ export async function createProduct(values: unknown) {
       data: {
         name: data.name,
         slug: data.slug,
+
         description: data.description || null,
         shortDescription: data.shortDescription || null,
 
         thumbnail: data.thumbnail || null,
 
+        // PDF / Digital Kit URL
+        fileUrl:
+          data.type === "PDF"
+            ? data.fileUrl || null
+            : null,
+
         price: data.price,
 
+        // AI Credits Product
         credits:
           data.type === "AI_CREDITS"
             ? data.credits ?? null
@@ -53,7 +66,9 @@ export async function createProduct(values: unknown) {
             : null,
 
         type: data.type,
+
         status: data.status,
+
         isFeatured: data.isFeatured,
 
         publishedAt:
@@ -65,6 +80,7 @@ export async function createProduct(values: unknown) {
 
     revalidatePath("/admin/products");
     revalidatePath("/courses");
+    revalidatePath("/pricing");
 
     return {
       success: true,
@@ -75,7 +91,10 @@ export async function createProduct(values: unknown) {
 
     return {
       success: false,
-      message: "Failed to create product.",
+      message:
+        error instanceof Error
+          ? error.message
+          : "Failed to create product.",
     };
   }
 }
