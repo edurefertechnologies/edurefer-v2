@@ -14,6 +14,7 @@ import {
   Landmark,
   BarChart3,
   Settings,
+  BoxIcon,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -33,6 +34,11 @@ const navItems = [
     title: "Products",
     href: "/admin/products",
     icon: Package,
+  },
+  {
+    title: "Packages",
+    href: "/admin/packages",
+    icon: BoxIcon,
   },
   {
     title: "Courses",
