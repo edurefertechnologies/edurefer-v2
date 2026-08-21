@@ -9,9 +9,31 @@ import {
 } from "@/lib/email";
 
 export const auth = betterAuth({
+    /*
+     * =========================================================
+     * BASE URL
+     * =========================================================
+     */
+
+    baseURL:
+        process.env.BETTER_AUTH_URL ||
+        "http://localhost:3000",
+
+    /*
+     * =========================================================
+     * DATABASE
+     * =========================================================
+     */
+
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
+
+    /*
+     * =========================================================
+     * EMAIL + PASSWORD
+     * =========================================================
+     */
 
     emailAndPassword: {
         enabled: true,
@@ -32,13 +54,29 @@ export const auth = betterAuth({
         },
     },
 
+    /*
+     * =========================================================
+     * GOOGLE LOGIN
+     * =========================================================
+     */
+
     socialProviders: {
         google: {
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            clientId:
+                process.env.GOOGLE_CLIENT_ID!,
+
+            clientSecret:
+                process.env.GOOGLE_CLIENT_SECRET!,
+
             prompt: "select_account",
         },
     },
+
+    /*
+     * =========================================================
+     * EMAIL VERIFICATION
+     * =========================================================
+     */
 
     emailVerification: {
         sendVerificationEmail: async ({
@@ -57,16 +95,24 @@ export const auth = betterAuth({
         autoSignInAfterVerification: true,
     },
 
+    /*
+     * =========================================================
+     * USER FIELDS
+     * =========================================================
+     */
+
     user: {
         additionalFields: {
             firstName: {
                 type: "string",
                 required: true,
             },
+
             lastName: {
                 type: "string",
                 required: false,
             },
+
             role: {
                 type: "string",
                 required: false,
@@ -75,6 +121,12 @@ export const auth = betterAuth({
         },
     },
 
+    /*
+     * =========================================================
+     * ADMIN
+     * =========================================================
+     */
+
     plugins: [
         admin({
             defaultRole: "STUDENT",
@@ -82,9 +134,15 @@ export const auth = betterAuth({
         }),
     ],
 
+    /*
+     * =========================================================
+     * TRUSTED ORIGINS
+     * =========================================================
+     */
+
     trustedOrigins: [
-        process.env.BETTER_AUTH_URL!,
         "https://edurefertech.com",
         "https://www.edurefertech.com",
+        "http://localhost:3000",
     ],
 });
