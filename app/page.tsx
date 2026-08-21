@@ -8,12 +8,14 @@ import FAQ from "@/components/home/faq";
 import Newsletter from "@/components/home/newsletter";
 import HomeNavbar from "@/components/home/home-navbar";
 import Footer from "@/components/layout/footer";
+import LiveLearningMarquee from "@/components/home/live-learning-marquee";
 
 export default function HomePage() {
   return (
     <>
       <HomeNavbar />
       <Hero />
+      <LiveLearningMarquee />
       <Stats />
       <LearningProcess />
       <Testimonials />
