@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
+import Image from "next/image";
 
 import {
   ArrowRight,
@@ -204,23 +205,13 @@ export default function LoginForm() {
             <>
               {/* Google-style G */}
 
-              <span
-                className="
-                  mr-3
-                  flex
-                  h-6
-                  w-6
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-white
-                  text-sm
-                  font-bold
-                  text-slate-900
-                "
-              >
-                G
-              </span>
+              <Image
+                src="/google_logo.png"
+                alt="Google"
+                width={22}
+                height={22}
+                className="mr-3 h-5 w-5"
+              />
 
               Continue with Google
             </>
