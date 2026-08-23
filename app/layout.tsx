@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Analytics } from "@vercel/analytics/react";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -109,6 +110,7 @@ export default function RootLayout({
               <Toaster richColors position="top-right" />
             </TooltipProvider>
           </div>
+          <Analytics />
         </ThemeProvider>
         <Script
           src="https://checkout.razorpay.com/v1/checkout.js"
