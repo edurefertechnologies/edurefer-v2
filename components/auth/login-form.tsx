@@ -183,22 +183,22 @@ export default function LoginForm() {
     relative
     h-12
     w-full
-    border-white
-    bg-white
-    text-black
+    !border-white
+    !bg-white
+    !text-black
     shadow-sm
     transition-all
     duration-300
-    hover:border-gray-200
-    hover:bg-gray-100
-    hover:text-black
+    hover:!border-gray-200
+    hover:!bg-gray-100
+    hover:!text-black
   "
           disabled={isLoading}
           onClick={handleGoogleLogin}
         >
           {googleLoading ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <Loader2 className="mr-2 h-4 w-4 animate-spin !text-black" />
               Connecting to Google...
             </>
           ) : (
