@@ -62,13 +62,18 @@ export const auth = betterAuth({
 
     socialProviders: {
         google: {
-            clientId:
-                process.env.GOOGLE_CLIENT_ID!,
-
-            clientSecret:
-                process.env.GOOGLE_CLIENT_SECRET!,
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
 
             prompt: "select_account",
+
+            mapProfileToUser: (profile) => ({
+                firstName: profile.given_name || profile.name?.split(" ")[0] || "",
+                lastName:
+                    profile.family_name ||
+                    profile.name?.split(" ").slice(1).join(" ") ||
+                    "",
+            }),
         },
     },
 
