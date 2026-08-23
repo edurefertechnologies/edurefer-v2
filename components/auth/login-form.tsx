@@ -180,31 +180,29 @@ export default function LoginForm() {
           type="button"
           variant="outline"
           className="
-            relative
-            h-12
-            w-full
-            border-white/10
-            bg-white/[0.04]
-            text-white
-            shadow-sm
-            transition-all
-            duration-300
-            hover:border-cyan-400/30
-            hover:bg-white/[0.08]
-          "
+    relative
+    h-12
+    w-full
+    border-white
+    bg-white
+    text-black
+    shadow-sm
+    transition-all
+    duration-300
+    hover:border-gray-200
+    hover:bg-gray-100
+    hover:text-black
+  "
           disabled={isLoading}
           onClick={handleGoogleLogin}
         >
           {googleLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-
               Connecting to Google...
             </>
           ) : (
             <>
-              {/* Google-style G */}
-
               <Image
                 src="/google_logo.png"
                 alt="Google"
